@@ -4,13 +4,13 @@ import re
 from help50 import helper, pre_helper
 
 
-@pre_helper("clang", "make")
+@pre_helper("clang")
 def unwrap_lines(output):
     """Unwrap long lines, since clang breaks long lines, indenting subsequent lines with 6 spaces."""
     return re.sub("\n      ", " ", output)
 
 
-@helper("clang", "make")
+@helper("clang")
 def invalid_append_string(lines):
     """
     >>> output = "test.c:6:15: error: adding 'char' to a string does not append to the string [-Werror, -Wstring-plus-int]\\n    printf(\"\" + c);"
@@ -31,7 +31,7 @@ def invalid_append_string(lines):
 
 
 
-@helper("clang", "make")
+@helper("clang")
 def array_bounds(lines):
     """
     >>> output = 'test.c:5:20: error: array index 1 is past the end of the array (which contains 1 element) [-Werror,-Warray-bounds]\\n    printf("%d\\\\n", a[1]);\\n                   ^ ~'
@@ -55,7 +55,7 @@ def array_bounds(lines):
 
 
 
-@helper("clang", "make")
+@helper("clang")
 def bad_define(lines):
     """
     >>> output = "foo.c:18:1: error: unknown type name 'define'\\ndefine _XOPEN_SOURCE 500\\n^"
@@ -71,7 +71,7 @@ def bad_define(lines):
         return lines[0:3 if len(lines) >= 3 else 1], response
 
 
-@helper("clang", "make")
+@helper("clang")
 def bad_include(lines):
     """
     >>> output = "foo.c:18:1: error: unknown type name 'include'\\ninclude <stdio.h>\\n^"
@@ -86,7 +86,7 @@ def bad_include(lines):
         return lines[0:3 if len(lines) >= 3 else 1], response
 
 
-@helper("clang", "make")
+@helper("clang")
 def unknown_type(lines):
     """
     >>> output = "foo.c:1:1: error: unknown type name 'bar'\\nbar baz\\n^"
@@ -114,7 +114,7 @@ def unknown_type(lines):
     return lines[0:3 if len(lines) >= 3 else 1], response
 
 
-@helper("clang", "make")
+@helper("clang")
 def unused_var(lines):
     """
     >>> output = "foo.c:6:9: error: unused variable 'x' [-Werror,-Wunused-variable]\\n    int x = 28;\\n        ^"
@@ -131,7 +131,7 @@ def unused_var(lines):
     return lines[0:1], response
 
 
-@helper("clang", "make")
+@helper("clang")
 def self_initialization(lines):
     """
     >>> output = "water.c:8:15: error: variable 'x' is uninitialized when used within its own initialization [-Werror,-Wuninitialized]\\nint x= 12*x;\\n     ~     ^"
@@ -150,7 +150,7 @@ def self_initialization(lines):
     return lines[0:1], response
 
 
-@helper("clang", "make")
+@helper("clang")
 def void_return(lines):
     """
     >>> output = "foo.c:6:10: error: void function 'f' should not return a value [-Wreturn-type]\\n    return 0;\\n    ^      ~"
@@ -173,7 +173,7 @@ def void_return(lines):
             ]
             return lines[0:1], response
 
-@helper("clang", "make")
+@helper("clang")
 def array_subscript(lines):
     """
     >>> output = "foo.c:6:21: error: array subscript is not an integer\\n" \
@@ -206,7 +206,7 @@ def array_subscript(lines):
 
 
 
-@helper("clang", "make")
+@helper("clang")
 def missing_parens(lines):
     """
     >>> output = "foo.c:1:3: error: assigning to 'float' from incompatible type 'float (void)'\\n" \
@@ -232,7 +232,7 @@ def missing_parens(lines):
         return lines[0:1], response;
 
 
-@helper("clang", "make")
+@helper("clang")
 def conflicting_types(lines):
     """
     >>> output = "foo.c:3:12: error: conflicting types for 'round'\\n" \
@@ -260,7 +260,7 @@ def conflicting_types(lines):
     return lines[0:1], response
 
 
-@helper("clang", "make")
+@helper("clang")
 def continue_not_in_loop(lines):
     """
     >>> output = "test.c:51:17: error: 'continue' statement not in loop statement\\n" \
