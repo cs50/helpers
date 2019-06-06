@@ -278,6 +278,20 @@ def continue_not_in_loop(lines):
     ]
     return lines[0:1], response
 
+def control_reaches_non_void(lines):
+    """
+    >>> output = "foo.c:3:16: warning: control reaches end of non-void function [-Wreturn-type]\\n" \
+                 "int foo(void) {}\\n" \
+                 "               ^"
+
+    >>> control_reaches_non_void(output.splitlines())[1][0]
+    'Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`.'
+    """
+    matches = _match(r"control (may )?reach(es)? end of non-void function", lines[0])
+    if not matches:
+        return
+    response = ["Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`."]
+    return lines[0:1], response
 
 #TODO: Copy the rest from help50-server
 
