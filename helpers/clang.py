@@ -1,13 +1,13 @@
 import collections
 import re
 
-from help50 import helper, pre_helper
+from help50 import helper, preprocessor
 
 
-@pre_helper("clang")
+@preprocessor("clang")
 def unwrap_lines(output):
-    """Unwrap long lines, since clang breaks long lines, indenting subsequent lines with 6 spaces."""
-    return re.sub("\n      ", " ", output)
+    """Unwrap long lines, since clang breaks them, indenting subsequent lines with 6 spaces."""
+    return re.sub("\n" + " " * 6, " ", output)
 
 
 @helper("clang")
