@@ -7,7 +7,7 @@ from help50 import helper, preprocessor
 @preprocessor("clang")
 def unwrap_lines(output):
     """Unwrap long lines, since clang breaks them, indenting subsequent lines with 6 spaces."""
-    return re.sub("\n" + " " * 6, " ", output)
+    return re.sub("\n      ", " ", output)
 
 
 @helper("clang")
