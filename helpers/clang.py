@@ -7,10 +7,11 @@ from help50 import helper
 @helper("clang")
 def array_bounds(lines):
     """
-      >>> "location 1 of `a`" in array_bounds([                                                                                     \
-              "test.c:5:20: error: array index 1 is past the end of the array (which contains 1 element) [-Werror,-Warray-bounds]", \
-              "    printf(\\"%d\\\\n\\", a[1]);",                                                                                   \
-              "                   ^ ~"                                                                                              \
+      >>> "location 1 of `a`" in array_bounds([                                                           \
+              "test.c:5:20: error: array index 1 is past the end of the array (which contains 1 element)" \
+                  "[-Werror,-Warray-bounds]",                                                             \
+              "    printf(\\"%d\\\\n\\", a[1]);",                                                         \
+              "                   ^ ~"                                                                    \
            ])[1][0]
       True
     """
@@ -22,9 +23,11 @@ def array_bounds(lines):
     array = _caret_extract(lines[1:3])
 
     if array:
-        response = ["Careful, on line {} of `{}`, it looks like you're trying to access location {} of `{}`, which doesn't exist; `{}` isn't that long.".format(matches.line, matches.file, matches.group[0], array, array)]
+        response = ["Careful, on line {} of `{}`, it looks like you're trying to access location {} of `{}`," \
+            " which doesn't exist; `{}` isn't that long.".format(matches.line, matches.file, matches.group[0], array, array)]
     else:
-        response = ["Careful, on line {} of `{}`, it looks like you're trying to access location {} of an array, which doesn't exist; the array isn't that long.".format(matches.line, matches.file, matches.group[0])]
+        response = ["Careful, on line {} of `{}`, it looks like you're trying to access location {} of an array," \
+            " which doesn't exist; the array isn't that long.".format(matches.line, matches.file, matches.group[0])]
     response.append("Keep in mind that arrays are 0-indexed.")
 
     if array:
@@ -36,11 +39,11 @@ def array_bounds(lines):
 @helper("clang")
 def array_subscript(lines):
     """
-      >>> bool(array_subscript([                                      \
+      >>> all(s in array_subscript([                                  \
               "foo.c:6:21: error: array subscript is not an integer", \
               "    printf(\\"%i\\\\n\\", x[\\"28\\"]);",              \
               "                    ^~~~~"                             \
-          ]))
+          ])[1][0] for s in ["array `x`", "index (`\\"28\\"`)"])
       True
     """
     matches = _match(r"array subscript is not an integer", lines[0])
@@ -53,13 +56,15 @@ def array_subscript(lines):
 
     if array and index:
         response = [
-            "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index (`{}`) is not of type `int`.".format(array, matches.line, matches.file, index)
+            "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index (`{}`)" \
+                " is not of type `int`.".format(array, matches.line, matches.file, index)
         ]
         if index[0] == index[-1] == '"':
             response.append("Right now, your index is of type `string` instead.")
     else:
         response = [
-            "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`.".format(matches.line, matches.file)
+            "Looks like you're trying to access an element of an array on line {} of `{}`, but your index" \
+                " is not of type `int`.".format(matches.line, matches.file)
         ]
 
     response.append("Make sure your index (the value between square brackets) is an `int`.")
@@ -86,7 +91,8 @@ def bad_define(lines):
         return
 
     response = [
-        "If trying to define a constant on line {} of `{}`, be sure to use `#define` rather than just `define`.".format(matches.line, matches.file)
+        "If trying to define a constant on line {} of `{}`, be sure to use `#define` rather than" \
+            " just `define`.".format(matches.line, matches.file)
     ]
 
     return lines[0:3 if len(lines) >= 3 else 1], response
@@ -108,7 +114,8 @@ def bad_include(lines):
         return
 
     response = [
-        "If trying to include a header file on line {} of `{}`, be sure to use `#include` rather than just `include`.".format(matches.line, matches.file)
+        "If trying to include a header file on line {} of `{}`, be sure to use `#include` rather than" \
+            " just `include`.".format(matches.line, matches.file)
     ]
 
     return lines[0:3 if len(lines) >= 3 else 1], response
@@ -130,7 +137,8 @@ def conflicting_types(lines):
         return
 
     response = [
-        "Looks like you're redeclaring the function `{}`, but with a different return type on line {} of `{}`.".format(matches.group[0], matches.line, matches.file)
+        "Looks like you're redeclaring the function `{}`, but with a different return type on" \
+            " line {} of `{}`.".format(matches.group[0], matches.line, matches.file)
     ]
 
     if len(lines) >= 4:
@@ -162,7 +170,8 @@ def continue_not_in_loop(lines):
         return
 
     response = [
-        "Looks like you're trying to use `continue` on line {} of `{}`, which isn't inside of a loop, but that keyword can only be used inside of a loop.".format(matches.line, matches.file)
+        "Looks like you're trying to use `continue` on line {} of `{}`, which isn't inside of a loop, but that keyword" \
+            " can only be used inside of a loop.".format(matches.line, matches.file)
     ]
 
     return lines[0:1], response
@@ -182,7 +191,10 @@ def control_reaches_non_void(lines):
     if not matches:
         return
 
-    response = ["Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`."]
+    response = [
+        "Ensure that your function will always return a value. If your function is not meant to return a value," \
+            " try changing its return type to `void`."
+    ]
 
     return lines[0:1], response
 
@@ -205,7 +217,8 @@ def invalid_append_string(lines):
                 "as you seem to be trying to do on line {} of `{}`.".format(matches.line, matches.file)]
 
     if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
-        response.append("Odds are you want to provide `printf` with a format code for that value and pass that value to `printf` as an argument.")
+        response.append("Odds are you want to provide `printf` with a format code for that value and pass that value to" \
+            " `printf` as an argument.")
 
         return lines, response
 
@@ -230,13 +243,15 @@ def missing_parens(lines):
     function = _tilde_extract(lines[1:3])
     if function:
         response = [
-            "Looks like you're trying to call `{}` on line {} of `{}`, but did you forget parentheses after the function's name?".format(function, matches.line, matches.file)
+            "Looks like you're trying to call `{}` on line {} of `{}`, but did you forget parentheses after the" \
+                " function's name?".format(function, matches.line, matches.file)
         ]
 
         return lines[0:3], response;
 
     response = [
-        "Looks like you're trying to call a function on line {} of `{}`, but did you forget parentheses after the function's name?".format(matches.line, matches.file)
+        "Looks like you're trying to call a function on line {} of `{}`, but did you forget parentheses after the" \
+            " function's name?".format(matches.line, matches.file)
     ]
 
     return lines[0:1], response;
@@ -245,10 +260,11 @@ def missing_parens(lines):
 @helper("clang")
 def self_initialization(lines):
     """
-      >>> bool(self_initialization([                                                                                                  \
-              "water.c:8:15: error: variable 'x' is uninitialized when used within its own initialization [-Werror,-Wuninitialized]", \
-              "int x= 12*x;",                                                                                                         \
-              "     ~     ^"                                                                                                          \
+      >>> bool(self_initialization([                                                                       \
+              "water.c:8:15: error: variable 'x' is uninitialized when used within its own initialization" \
+                  " [-Werror,-Wuninitialized]",                                                            \
+              "int x= 12*x;",                                                                              \
+              "     ~     ^"                                                                               \
           ]))
       True
     """
@@ -258,7 +274,8 @@ def self_initialization(lines):
         return
 
     response = [
-        "Looks like you have `{}` on both the left- and right-hand side of the `=` on line {} of `{}`, but `{}` doesn't yet have a value.".format(matches.group[0], matches.line, matches.file, matches.group[0]),
+        "Looks like you have `{}` on both the left- and right-hand side of the `=` on line {} of `{}`, but `{}` doesn't" \
+            " yet have a value.".format(matches.group[0], matches.line, matches.file, matches.group[0]),
         "Be sure not to initialize `{}` with itself.".format(matches.group[0])
     ]
 
@@ -284,7 +301,8 @@ def unknown_type(lines):
         return
 
     response = [
-        "You seem to be using `{}` on line {} of `{}` as though it's a type, even though it's not been defined as one.".format(matches.group[0], matches.line, matches.file)
+        "You seem to be using `{}` on line {} of `{}` as though it's a type, even though it's not been defined as" \
+            " one.".format(matches.group[0], matches.line, matches.file)
     ]
 
     if matches.group[0] == "bool":
@@ -315,7 +333,8 @@ def unused_arg_in_fmt_string(lines):
         return
 
     response = [
-        "You have more arguments in your formatted string on line {} of `{}` than you have format codes.".format(matches.line, matches.file),
+        "You have more arguments in your formatted string on line {} of `{}` than you have" \
+            " format codes.".format(matches.line, matches.file),
         "Make sure that the number of format codes equals the number of additional arguments.",
         "Try either adding format code(s) or removing argument(s)."
     ]
@@ -342,7 +361,8 @@ def unused_var(lines):
         return
 
     response = [
-        "It seems that the variable `{}` (declared on line {} of `{}`) is never used in your program. Try either removing it altogether or using it.".format(matches.group[0], matches.line, matches.file)
+        "It seems that the variable `{}` (declared on line {} of `{}`) is never used in your program. Try either removing" \
+            " it altogether or using it.".format(matches.group[0], matches.line, matches.file)
     ]
 
     return lines[0:1], response
@@ -367,14 +387,16 @@ def void_return(lines):
 
     if len(lines) >= 3 and value:
         response = [
-            "It looks like your function, `{}`, is returning `{}` on line {} of `{}`, but its return type is `void`.".format(matches.group[0], value, matches.line, matches.file),
+            "It looks like your function, `{}`, is returning `{}` on line {} of `{}`, but its return type is" \
+                " `void`.".format(matches.group[0], value, matches.line, matches.file),
             "Are you sure you want to return a value?"
         ]
 
         return lines[0:3], response
 
     response = [
-        "It looks like your function, `{}`, is returning a value on line {} of `{}`, but its return type is `void`.".format(matches.group[0], matches.line, matches.file),
+        "It looks like your function, `{}`, is returning a value on line {} of `{}`, but its return type is" \
+            " `void`.".format(matches.group[0], matches.line, matches.file),
         "Are you sure you want to return a value?"
     ]
 
