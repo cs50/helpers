@@ -1,23 +1,17 @@
 import collections
 import re
 
-from help50 import helper, preprocessor
-
-
-@preprocessor("clang")
-def unwrap_lines(output):
-    """Unwrap long lines, since clang breaks them, indenting subsequent lines with 6 spaces."""
-    return re.sub("\n      ", " ", output)
+from help50 import helper
 
 
 @helper("clang")
 def array_bounds(lines):
     """
-      >>> bool(array_bounds([                                                                                                       \
+      >>> "location 1 of `a`" in array_bounds([                                                                                     \
               "test.c:5:20: error: array index 1 is past the end of the array (which contains 1 element) [-Werror,-Warray-bounds]", \
               "    printf(\\"%d\\\\n\\", a[1]);",                                                                                   \
               "                   ^ ~'"                                                                                             \
-          ]))
+           ]))[1][0]
       True
     """
     matches = _match(r"array index (\d+) is past the end of the array", lines[0])
@@ -37,6 +31,7 @@ def array_bounds(lines):
         return lines[0:3], response
 
     return lines[0:1], response
+
 
 @helper("clang")
 def array_subscript(lines):
@@ -428,13 +423,13 @@ def _match(expression, line, raw=False):
 
     if not matches:
         return None
-        
+
     if raw:
         return _ClangMatch(file=None, line=None, group=matches.groups())
-    else:
-        return _ClangMatch(file=matches.group(1),
-                           line=matches.group(2),
-                           group=matches.groups()[2:])
+
+    return _ClangMatch(file=matches.group(1),
+                       line=matches.group(2),
+                       group=matches.groups()[2:])
 
 
 def _tilde_extract(lines):
