@@ -147,7 +147,8 @@ def conflicting_types(lines):
             if matches.file == prev_declaration.group(1):
                 response.append("You had already declared this function on line {}.".format(prev_declaration.group(2)))
             else:
-                response.append("The function `{}` is already declared in the library {}. Try renaming your function.".format(matches.group[0], prev_declaration.group(1).split('/')[-1]))
+                response.append("The function `{}` is already declared in the library {}. Try renaming your" \
+                    " function.".format(matches.group[0], prev_declaration.group(1).split('/')[-1]))
 
             return lines[0:4], response
 
