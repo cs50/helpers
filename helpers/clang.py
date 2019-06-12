@@ -10,8 +10,8 @@ def array_bounds(lines):
       >>> "location 1 of `a`" in array_bounds([                                                                                     \
               "test.c:5:20: error: array index 1 is past the end of the array (which contains 1 element) [-Werror,-Warray-bounds]", \
               "    printf(\\"%d\\\\n\\", a[1]);",                                                                                   \
-              "                   ^ ~'"                                                                                             \
-           ]))[1][0]
+              "                   ^ ~"                                                                                              \
+           ])[1][0]
       True
     """
     matches = _match(r"array index (\d+) is past the end of the array", lines[0])
