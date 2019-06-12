@@ -301,13 +301,15 @@ def unknown_type(lines):
     if not matches:
         return
 
+    if matches.group[0] == "define":
+        return bad_define(lines)
+    if matches.group[0] == "include":
+        return bad_include(lines)
+
     response = [
         "You seem to be using `{}` on line {} of `{}` as though it's a type, even though it's not been defined as" \
             " one.".format(matches.group[0], matches.line, matches.file)
     ]
-
-    if matches.group[0] == "define":
-        return bad_define(lines)
 
     if matches.group[0] == "bool":
         response.append("Did you forget `#include <cs50.h>` or `#include <stdbool.h>` atop `{}`?".format(matches.file))
