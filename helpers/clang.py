@@ -306,6 +306,9 @@ def unknown_type(lines):
             " one.".format(matches.group[0], matches.line, matches.file)
     ]
 
+    if matches.group[0] == "define":
+        return bad_define(lines)
+
     if matches.group[0] == "bool":
         response.append("Did you forget `#include <cs50.h>` or `#include <stdbool.h>` atop `{}`?".format(matches.file))
     elif matches.group[0] == "size_t":
