@@ -278,6 +278,7 @@ def continue_not_in_loop(lines):
     ]
     return lines[0:1], response
 
+
 def control_reaches_non_void(lines):
     """
     >>> output = "foo.c:3:16: warning: control reaches end of non-void function [-Wreturn-type]\\n" \
@@ -292,6 +293,34 @@ def control_reaches_non_void(lines):
         return
     response = ["Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`."]
     return lines[0:1], response
+
+
+@helper("clang")
+def unused_arg_in_fmt_string(lines):
+    """
+    >>> bool(unused_arg_in_fmt_string([                                                                  \
+            'foo.c:5:29: error: data argument not used by format string [-Werror,-Wformat-extra-args]',  \
+            '    printf("%d %d", 27, 28, 29);',                                                          \
+            '           ~~~~~~~          ^'                                                              \
+        ]))
+    True
+    """
+
+    matches = _match(r"data argument not used by format string", lines[0])
+
+    if not matches:
+        return
+
+    response = [
+        "You have more arguments in your formatted string on line {} of `{}` than you have format codes.".format(matches.line, matches.file),
+        "Make sure that the number of format codes equals the number of additional arguments.",
+        "Try either adding format code(s) or removing argument(s)."
+    ]
+
+    if len(lines) >= 2 and re.search(r"%", lines[1]):
+        return lines[0:2], response
+    return lines[0:1], response
+
 
 #TODO: Copy the rest from help50-server
 
