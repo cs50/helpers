@@ -242,6 +242,7 @@ def expected_closing_brace(lines):
         return
 
     response = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
+    
     return lines[0:1], response
 
 
