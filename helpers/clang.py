@@ -231,7 +231,6 @@ def div_by_zero(lines):
 def expected_closing_brace(lines):
     """
       >>> bool(expected_closing_brace([                 \
-              "/tmp/foo-1ce1b9.o: In function `main':", \
               "foo.c:9:2: error: expected '}'",         \
               "}",                                      \
               " ^"                                      \
@@ -243,7 +242,7 @@ def expected_closing_brace(lines):
         return
 
     response = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
-    return (lines[0:1], response)
+    return lines[0:1], response
 
 
 @helper("clang")
