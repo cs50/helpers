@@ -9,7 +9,7 @@ def array_bounds(lines):
     """
       >>> "location 1 of `a`" in array_bounds([                                                           \
               "test.c:5:20: error: array index 1 is past the end of the array (which contains 1 element)" \
-                  "[-Werror,-Warray-bounds]",                                                             \
+              "[-Werror,-Warray-bounds]",                                                                 \
               "    printf(\\"%d\\\\n\\", a[1]);",                                                         \
               "                   ^ ~"                                                                    \
            ])[1][0]
@@ -177,6 +177,7 @@ def continue_not_in_loop(lines):
 
     return lines[0:1], response
 
+
 @helper("clang")
 def control_reaches_non_void(lines):
     """
@@ -198,6 +199,32 @@ def control_reaches_non_void(lines):
     ]
 
     return lines[0:1], response
+
+
+@helper("clang")
+def div_by_zero(lines):
+    """
+      >>> bool(div_by_zero([                                                                   \
+              "foo.c:5:16: error: division by zero is undefined [-Werror,-Wdivision-by-zero]", \
+              "int x = 28 / 0;",                                                               \
+              "           ^ ~"                                                                 \
+          ]))
+      True
+    """
+    matches = match(r"division by zero is undefined", lines[0])
+
+    if not matches:
+        return
+
+    response = [
+        "Looks like you're trying to divide by `0` (which isn't defined mathematically) on line {} of" \
+        " `{}`.".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 2:
+        return (lines[0:2], response)
+
+    return (lines[0:1], response)
 
 
 @helper("clang")
@@ -263,7 +290,7 @@ def self_initialization(lines):
     """
       >>> bool(self_initialization([                                                                       \
               "water.c:8:15: error: variable 'x' is uninitialized when used within its own initialization" \
-                  " [-Werror,-Wuninitialized]",                                                            \
+              " [-Werror,-Wuninitialized]",                                                                \
               "int x= 12*x;",                                                                              \
               "     ~     ^"                                                                               \
           ]))
