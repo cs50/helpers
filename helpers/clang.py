@@ -228,6 +228,25 @@ def div_by_zero(lines):
 
 
 @helper("clang")
+def expected_closing_brace(lines):
+    """
+      >>> bool(expected_closing_brace([                 \
+              "/tmp/foo-1ce1b9.o: In function `main':", \
+              "foo.c:9:2: error: expected '}'",         \
+              "}",                                      \
+              " ^"                                      \
+          ]))
+      True
+    """
+    matches = _match(r"expected '}'", lines[0])
+    if not matches:
+        return
+
+    response = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
+    return (lines[0:1], response)
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
