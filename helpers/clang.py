@@ -177,7 +177,7 @@ def continue_not_in_loop(lines):
 
     return lines[0:1], response
 
-
+@helper("clang")
 def control_reaches_non_void(lines):
     """
       >>> bool(control_reaches_non_void([                                                      \
