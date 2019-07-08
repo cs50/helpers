@@ -229,11 +229,11 @@ def invalid_append_string(lines):
 @helper("clang")
 def missing_parens(lines):
     """
-      >>> bool(missing_parens([                                                               \
+      >>> "call `get_float`" in missing_parens([                                              \
               "foo.c:1:3: error: assigning to 'float' from incompatible type 'float (void)'", \
               "        f = get_float",                                                        \
               "          ^ ~~~~~~~~~"                                                         \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"assigning to '(.+)' from incompatible type '.+ \(.+\)'", lines[0])
@@ -377,11 +377,11 @@ def unused_var(lines):
 @helper("clang")
 def void_return(lines):
     """
-      >>> bool(void_return([                                                                    \
+      >>> "returning `0`" in void_return([                                                      \
               "foo.c:6:10: error: void function 'f' should not return a value [-Wreturn-type]", \
               "    return 0;",                                                                  \
               "    ^      ~"                                                                    \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"void function '(.+)' should not return a value", lines[0])
