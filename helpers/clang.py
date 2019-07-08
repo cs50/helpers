@@ -211,7 +211,7 @@ def div_by_zero(lines):
           ]))
       True
     """
-    matches = match(r"division by zero is undefined", lines[0])
+    matches = _match(r"division by zero is undefined", lines[0])
 
     if not matches:
         return
