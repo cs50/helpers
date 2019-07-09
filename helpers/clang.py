@@ -572,7 +572,7 @@ def extraneous_parens(lines):
             "the semicolon.".format(matches.line, matches.file)
     ]
 
-    if len(lines) >= 3 and has_caret(lines[2]):
+    if len(lines) >= 3 and _has_caret(lines[2]):
         return lines[0:3], response
 
     return lines[0:1], response
