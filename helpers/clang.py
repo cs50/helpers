@@ -307,7 +307,7 @@ def expected_semi_colon(lines):
     """
       >>> bool(expected_semi_colon([                              \
               "foo.c:5:27: error: expected ';' after expression", \
-              "   printf("hello, world!")",                       \
+              "   printf(\\"hello, world!\\")",                   \
               "                          ^",                      \
               "                          ;"                       \
           ]))
