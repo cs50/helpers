@@ -523,6 +523,37 @@ def expression_result_unused(lines):
 
 
 @helper("clang")
+def extra_tokens_at_end_of_include(lines):
+    """
+      >>> bool(extra_tokens_at_end_of_include([                                                        \
+              "foo.c:1:19: error: extra tokens at end of #include directive [-Werror,-Wextra-tokens]", \
+              "#include <stdio.h>;",                                                                   \
+              "                  ^"                                                                    \
+          ]))
+      True
+    """
+    matches = _match(r"extra tokens at end of #include directive", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "You seem to have an error in `{}` on line {}.".format(matches.file, matches.line),
+        "By \"extra tokens\", `clang` means that you have one or more extra characters on that line that you shouldn't."
+    ]
+
+    if len(lines) >= 3 and re.search(r"^\s*\^", lines[2]):
+        token = lines[1][lines[2].index("^")]
+        if token == ";":
+            response.append("Try removing the semicolon at the end of that line.")
+        else:
+            response.append("Try removing the `{}` at the end of that line.".format(token))
+
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
