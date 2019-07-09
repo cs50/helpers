@@ -278,6 +278,31 @@ def expected_closing_parens(lines):
 
 
 @helper("clang")
+def expected_for_semi_colon(lines):
+    """
+      >>> bool(expected_for_semi_colon([                                      \
+              "foo.c:5:22: error: expected ';' in 'for' statement specifier", \
+              "   for (int i = 0, i < 28, i++)",                              \
+              "                     ^"                                        \
+          ]))
+      True
+    """
+    matches = _match(r"expected ';' in 'for' statement specifier", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Be sure to separate the three components of the 'for' loop on line {} with " \
+            "semicolons.".format(matches.file)
+    ]
+
+    if len(lines) >= 2 and re.search(r"for\s*\(", lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def expected_if_open_parens(lines):
     """
       >>> bool(expected_if_open_parens([                   \
