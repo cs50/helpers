@@ -554,6 +554,31 @@ def extra_tokens_at_end_of_include(lines):
 
 
 @helper("clang")
+def extraneous_parens(lines):
+    """
+      >>> bool(extraneous_parens([                                      \
+              "foo.c:1:19: error: extraneous ')' before ';' [-Werror]", \
+              "digit = (number % (tracker)) / (tracker/10));",          \
+              "                                           ^"            \
+          ]))
+      True
+    """
+    matches = _match(r"extraneous '\)' before ';'", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "You seem to have an extra parenthesis on line {} of `{}`, just before " \
+            "the semicolon.".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 3 and has_caret(lines[2]):
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
