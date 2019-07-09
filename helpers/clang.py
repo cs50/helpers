@@ -199,6 +199,76 @@ def control_reaches_non_void(lines):
 
 
 @helper("clang")
+def declaration_shadows_local_var(lines):
+    """
+      >>> bool(declaration_shadows_local_var([                                              \
+              "foo.c:6:8: error: declaration shadows a local variable [-Werror,-Wshadow]",  \
+              "   int x = 28;",                                                             \
+              "       ^",                                                                   \
+              "foo.c:5:13: note: previous declaration is here",                             \
+              "              int x = 2;",                                                   \
+              "                  ^"                                                         \
+          ]))
+      True
+
+      >>> bool(declaration_shadows_local_var([                                              \
+              "bar.c:5:20: error: declaration shadows a local variable [-Werror,-Wshadow]", \
+              "   for (int i = 0, i < 28, i++)",                                            \
+              "                   ^"                                                        \
+          ]))
+      True
+    """
+    matches = _match(r"declaration shadows a local variable", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "On line {} of `{}`, it looks like you're trying to declare a variable that's already been declared " \
+            "elsewhere.".format(matches.line, matches.file)
+    ]
+
+    # check to see if declaration shadowing is due to for loop with commas instead of semicolons
+    if len(lines) >= 2:
+        for_loop = re.search(r"^\s*for\s*\(", lines[1])
+        if for_loop:
+            response.append("If you meant to create a `for` loop, be sure that each part of the `for` loop is separated " \
+                                "with a semicolon rather than a comma.")
+                                
+            if (len(lines) >= 3 and re.search(r"^\s*\^$", lines[2])):
+                return lines[0:3], response
+
+            return lines[0:2], response
+
+    # see if we can get the line number of the previous declaration of the variable
+    prev_declaration_file = None
+    prev_declaration_line = None
+    if len(lines) >= 4:
+        prev = re.search(r"^([^:]+):(\d+):\d+: note: previous declaration is here", lines[3])
+        if prev:
+            prev_declaration_line = prev.group(2)
+            prev_declaration_file = prev.group(1)
+
+    omit_suggestion = "If you meant to use the variable you've already declared previously"
+    if prev_declaration_line and prev_declaration_file:
+        omit_suggestion += " (on line {} of `{}`)".format(prev_declaration_line, prev_declaration_file)
+
+    omit_suggestion += ", try getting rid of the data type of the variable on line {} of `{}`. You only need " \
+                           "to include the data type when you first declare a variable.".format(matches.line, matches.file)
+
+    response.append(omit_suggestion)
+    response.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name that " \
+                        "hasn't been used yet.")
+
+    if len(lines) >= 4 and prev_declaration_line != None:
+        return lines[0:7], response if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else lines[0:4], response
+
+    if len(lines) >= 2:
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def div_by_zero(lines):
     """
       >>> bool(div_by_zero([                                                                   \
