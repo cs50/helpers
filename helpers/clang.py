@@ -560,11 +560,12 @@ def void_return(lines):
 #TODO: Copy the rest from help50-server
 
 
-# This helper should ALWAYS be last -- it is a catch-all, worst case scenario.
 @helper("clang")
 def catch_all(lines):
     """
-      >>> bool(catch_all([                           \
+      This helper should **ALWAYS** be the last helper -- it is a catch-all, worst case scenario.
+
+      >>> bool(catch_all([                              \
               "foo.c:28:28: error: expected expression" \
           ]))
       True
