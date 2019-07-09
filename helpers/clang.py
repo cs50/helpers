@@ -382,6 +382,27 @@ def expected_semi_colon(lines):
 
 
 @helper("clang")
+def expected_while_in_do_while(lines):
+    """
+      >>> bool(expected_while_in_do_while([                          \
+              "foo.c:9:1: error: expected 'while' in do/while loop", \
+              "}",                                                   \
+              "^"                                                    \
+          ]))
+      True
+    """
+    matches = _match(r"expected 'while' in do/while loop", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like you're trying to create a `do/while` loop, but you've left off the `while` statement.",
+        "Try adding `while` followed by a condition just before line {} of `{}`.".format(matches.line, matches.file)
+    ]
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
