@@ -304,6 +304,32 @@ def expected_for_semi_colon(lines):
 
 
 @helper("clang")
+def expected_identifier_or_parens(lines):
+    """
+      >>> bool(expected_identifier_or_parens([                 \
+              "foo.c:1:17: error: expected identifier or '('", \
+              "int main(void); {",                             \
+              "                ^",                             \
+              "1 error generated."                             \
+          ]))
+      True
+    """
+    matches = _match(r"expected identifier or '\('", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like `clang` is having some trouble understanding where your functions start and end in your code.",
+        "Are you defining a function (like `main` or some other function) somewhere just before " \
+            "line {} of `{}`?".format(matches.line, matches.file),
+        "If so, make sure the function's first line doesn't end with a semicolon.",
+        "Also, make sure that all of the code for your function is inside of curly braces."
+    ]
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def expected_if_open_parens(lines):
     """
       >>> bool(expected_if_open_parens([                   \
@@ -567,16 +593,16 @@ def catch_all(lines):
     """
       This helper should **ALWAYS** be the last helper -- it is a catch-all, worst case scenario.
 
-      >>> bool(catch_all([                                \
-              "foo.c:28:28: error: expected expression"   \
+      >>> bool(catch_all([                              \
+              "foo.c:28:28: error: expected expression" \
           ]))
       True
 
-      >>> bool(catch_all([                                     \
-              "bar.c:8:16: error: expected identifier or '('", \
-              "  int 0 = 1;",                                  \
-              "      ^",                                       \
-              "1 error generated.",                            \
+      >>> bool(catch_all([                              \
+              "bar.c:8:16: error: expected identifier", \
+              "  if (i < 23) && (i > 0) {",             \
+              "                 ^",                     \
+              "1 error generated.",                     \
           ]))
       True
     """

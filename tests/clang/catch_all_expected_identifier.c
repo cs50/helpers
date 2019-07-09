@@ -1,3 +1,6 @@
 int main(void) {
-  int 0 = 1;
+  int i = 1;
+  if (i < 23) && (i > 0) {
+
+  }
 }
