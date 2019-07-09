@@ -278,26 +278,6 @@ def expected_closing_parens(lines):
 
     return lines[0:n], response
 
-
-@helper("clang")
-def expected_expression(lines):
-    """
-      >>> bool(expected_expression([                    \
-              "foo.c:28:28: error: expected expression" \
-          ]))
-      True
-    """
-    matches = _match(r"expected expression", lines[0])
-    if not matches:
-        return
-
-    response = [
-        "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.line, matches.file)
-    ]
-
-    return lines[0:1], response
-
-
 @helper("clang")
 def expected_for_semi_colon(lines):
     """
@@ -578,6 +558,27 @@ def void_return(lines):
 
 
 #TODO: Copy the rest from help50-server
+
+
+# This helper should ALWAYS be last -- it is a catch-all, worst case scenario.
+@helper("clang")
+def catch_all(lines):
+    """
+      >>> bool(catch_all([                           \
+              "foo.c:28:28: error: expected expression" \
+          ]))
+      True
+    """
+    matches = _match(r".*", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.line, matches.file)
+    ]
+
+    return lines[0:1], response
+
 
 # HELPERS FOR THE HELPERS
 
