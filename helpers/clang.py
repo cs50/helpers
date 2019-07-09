@@ -303,6 +303,31 @@ def expected_if_open_parens(lines):
 
 
 @helper("clang")
+def expected_semi_colon(lines):
+    """
+      >>> bool(expected_semi_colon([                              \
+              "foo.c:5:27: error: expected ';' after expression", \
+              "   printf("hello, world!")",                       \
+              "                          ^",                      \
+              "                          ;"                       \
+          ]))
+      True
+    """
+    matches = _match(r"expected ';' (?:after expression|at end of declaration|after do\/while statement)", lines[0])
+    if not matches:
+        return
+
+    response = ["Are you missing a semicolon at the end of line {} of `{}`?".format(matches.line, matches.file)]
+
+    if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
+        if len(lines) >= 4 and re.search(r"^\s*;$", lines[3]):
+            return lines[0:4], response
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
