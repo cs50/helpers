@@ -243,6 +243,31 @@ def expected_closing_brace(lines):
 
 
 @helper("clang")
+def expected_if_open_parens(lines):
+    """
+      >>> bool(expected_if_open_parens([                   \
+              "foo.c:6:8: error: expected '(' after 'if'", \
+              "    if x == 28",                            \
+              "       ^"                                   \
+          ]))
+      True
+    """
+    matches = _match(r"expected '\(' after 'if'", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "In your `if` statement on line {} of `{}`, be sure that you're enclosing the condition you're testing within" \
+            " parentheses.".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
