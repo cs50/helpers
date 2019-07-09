@@ -237,7 +237,9 @@ def expected_closing_brace(lines):
     if not matches:
         return
 
-    response = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
+    response = [
+        "Make sure that all opening brace symbols `{` are matched with a closing brace `}`."
+    ]
 
     return lines[0:1], response
 
@@ -275,6 +277,25 @@ def expected_closing_parens(lines):
     ]
 
     return lines[0:n], response
+
+
+@helper("clang")
+def expected_expression(lines):
+    """
+      >>> bool(expected_expression([                    \
+              "foo.c:28:28: error: expected expression" \
+          ]))
+      True
+    """
+    matches = _match(r"expected expression", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.line, matches.file)
+    ]
+
+    return lines[0:1], response
 
 
 @helper("clang")
