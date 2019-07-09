@@ -567,8 +567,16 @@ def catch_all(lines):
     """
       This helper should **ALWAYS** be the last helper -- it is a catch-all, worst case scenario.
 
-      >>> bool(catch_all([                              \
-              "foo.c:28:28: error: expected expression" \
+      >>> bool(catch_all([                                \
+              "foo.c:28:28: error: expected expression"   \
+          ]))
+      True
+
+      >>> bool(catch_all([                                     \
+              "bar.c:8:16: error: expected identifier or '('", \
+              "  int 0 = 1;",                                  \
+              "      ^",                                       \
+              "1 error generated.",                            \
           ]))
       True
     """
