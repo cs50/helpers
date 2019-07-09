@@ -243,6 +243,39 @@ def expected_closing_brace(lines):
 
 
 @helper("clang")
+def expected_closing_parens(lines):
+    """
+      >>> bool(expected_closing_parens([        \
+              "foo.c:6:1: error: expected ')'", \
+              "}",                              \
+              "^"                               \
+          ]))
+      True
+    """
+    matches = _match(r"expected '\)'", lines[0])
+    if not matches:
+        return
+
+    # assume that the line number for the matching ')' is the line that generated the error
+    match_line = matches.line
+    n = 1
+
+    # if there's a note on which '(' to match, use that line number instead
+    if len(lines) >= 4 and re.search(r"^([^:]+):(\d+):\d+: note: to match this '\('", lines[3]):
+        match_line = parens_match.group(2)
+        n = 4
+
+    response = [
+        "Make sure that all opening parentheses `(` are matched with a closing parenthesis" \
+            " `)` in `{}`.".format(matches.file),
+        "In particular, check to see if you are missing a closing parenthesis" \
+            " on line {} of `{}`.".format(match_line, matches.file)
+    ]
+
+    return lines[0:n], response
+
+
+@helper("clang")
 def expected_if_open_parens(lines):
     """
       >>> bool(expected_if_open_parens([                   \
