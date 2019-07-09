@@ -525,11 +525,11 @@ def expression_result_unused(lines):
 @helper("clang")
 def extra_tokens_at_end_of_include(lines):
     """
-      >>> bool(extra_tokens_at_end_of_include([                                                        \
+      >>> "removing the `c`" in extra_tokens_at_end_of_include([                                                        \
               "foo.c:1:19: error: extra tokens at end of #include directive [-Werror,-Wextra-tokens]", \
-              "#include <stdio.h>;",                                                                   \
+              "#include <stdio.h>c",                                                                   \
               "                  ^"                                                                    \
-          ]))
+          ])[1][2]
       True
     """
     matches = _match(r"extra tokens at end of #include directive", lines[0])
