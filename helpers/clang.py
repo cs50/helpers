@@ -425,6 +425,34 @@ def expected_if_open_parens(lines):
 
 
 @helper("clang")
+def expected_param_declarator(lines):
+    """
+      >>> bool(expected_param_declarator([                        \
+              "foo.c:3:12: error: expected parameter declarator", \
+              "int square(28);",                                  \
+              "           ^",                                     \
+          ]))
+      True
+    """
+    matches = _match(r"expected parameter declarator", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "If you're trying to call a function on line {} of `{}`, be sure that you're calling it inside of curly braces " \
+            "within a function. Also check that the function's header (the line introducing the function's name) doesn't " \
+            "end in a semicolon.".format(matches.line, matches.file),
+        "Alternatively, if you're trying to declare a function or prototype on line {} of `{}`, be sure each argument " \
+            "to the function is formatted as a data type followed by a variable name.".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def expected_semi_colon(lines):
     """
       >>> bool(expected_semi_colon([                              \
