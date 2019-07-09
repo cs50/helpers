@@ -16,18 +16,21 @@ def array_bounds(lines):
       True
     """
     matches = _match(r"array index (\d+) is past the end of the array", lines[0])
-
     if not matches:
         return
 
     array = _caret_extract(lines[1:3])
 
     if array:
-        response = ["Careful, on line {} of `{}`, it looks like you're trying to access location {} of `{}`," \
-            " which doesn't exist; `{}` isn't that long.".format(matches.line, matches.file, matches.group[0], array, array)]
+        response = [
+            "Careful, on line {} of `{}`, it looks like you're trying to access location {} of `{}`, which doesn't" \
+                " exist; `{}` isn't that long.".format(matches.line, matches.file, matches.group[0], array, array)
+        ]
     else:
-        response = ["Careful, on line {} of `{}`, it looks like you're trying to access location {} of an array," \
-            " which doesn't exist; the array isn't that long.".format(matches.line, matches.file, matches.group[0])]
+        response = [
+            "Careful, on line {} of `{}`, it looks like you're trying to access location {} of an array," \
+                " which doesn't exist; the array isn't that long.".format(matches.line, matches.file, matches.group[0])
+        ]
     response.append("Keep in mind that arrays are 0-indexed.")
 
     if array:
@@ -47,7 +50,6 @@ def array_subscript(lines):
       True
     """
     matches = _match(r"array subscript is not an integer", lines[0])
-
     if not matches:
         return
 
@@ -86,7 +88,6 @@ def bad_define(lines):
       True
     """
     matches = _match(r"unknown type name 'define'", lines[0])
-
     if not matches:
         return
 
@@ -109,7 +110,6 @@ def bad_include(lines):
       True
     """
     matches = _match("unknown type name 'include'", lines[0])
-
     if not matches:
         return
 
@@ -132,7 +132,6 @@ def conflicting_types(lines):
       True
     """
     matches = _match(r"conflicting types for '(.*)'", lines[0])
-
     if not matches:
         return
 
@@ -166,7 +165,6 @@ def continue_not_in_loop(lines):
       True
     """
     matches = _match(r"'continue' statement not in loop statement", lines[0])
-
     if not matches:
         return
 
@@ -189,7 +187,6 @@ def control_reaches_non_void(lines):
       True
     """
     matches = _match(r"control (may )?reach(es)? end of non-void function", lines[0])
-
     if not matches:
         return
 
@@ -212,13 +209,12 @@ def div_by_zero(lines):
       True
     """
     matches = _match(r"division by zero is undefined", lines[0])
-
     if not matches:
         return
 
     response = [
         "Looks like you're trying to divide by `0` (which isn't defined mathematically) on line {} of" \
-        " `{}`.".format(matches.line, matches.file)
+            " `{}`.".format(matches.line, matches.file)
     ]
 
     if len(lines) >= 2:
@@ -242,7 +238,7 @@ def expected_closing_brace(lines):
         return
 
     response = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
-    
+
     return lines[0:1], response
 
 
@@ -256,12 +252,13 @@ def invalid_append_string(lines):
       True
     """
     matches = _match(r"adding '(.+)' to a string does not append to the string", lines[0])
-
     if not matches:
         return
 
-    response = ["Careful, you can't concatenate values and strings in C using the `+` operator, " \
-                "as you seem to be trying to do on line {} of `{}`.".format(matches.line, matches.file)]
+    response = [
+        "Careful, you can't concatenate values and strings in C using the `+` operator, " \
+                "as you seem to be trying to do on line {} of `{}`.".format(matches.line, matches.file)
+    ]
 
     if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
         response.append("Odds are you want to provide `printf` with a format code for that value and pass that value to" \
@@ -283,7 +280,6 @@ def missing_parens(lines):
       True
     """
     matches = _match(r"assigning to '(.+)' from incompatible type '.+ \(.+\)'", lines[0])
-
     if not matches:
         return
 
@@ -316,7 +312,6 @@ def self_initialization(lines):
       True
     """
     matches = _match(r"variable '(.+)' is uninitialized when used within its own initialization", lines[0])
-
     if not matches:
         return
 
@@ -343,7 +338,6 @@ def unknown_type(lines):
       True
     """
     matches = _match(r"unknown type name '(.+)'", lines[0])
-
     if not matches:
         return
 
@@ -380,7 +374,6 @@ def unused_arg_in_fmt_string(lines):
       True
     """
     matches = _match(r"data argument not used by format string", lines[0])
-
     if not matches:
         return
 
@@ -408,7 +401,6 @@ def unused_var(lines):
       True
     """
     matches = _match(r"unused variable '([^']+)'", lines[0])
-
     if not matches:
         return
 
@@ -431,7 +423,6 @@ def void_return(lines):
       True
     """
     matches = _match(r"void function '(.+)' should not return a value", lines[0])
-
     if not matches:
         return
 
