@@ -261,9 +261,11 @@ def expected_closing_parens(lines):
     n = 1
 
     # if there's a note on which '(' to match, use that line number instead
-    if len(lines) >= 4 and re.search(r"^([^:]+):(\d+):\d+: note: to match this '\('", lines[3]):
-        match_line = parens_match.group(2)
-        n = 4
+    if len(lines) >= 4:
+        parens_match = re.search(r"^([^:]+):(\d+):\d+: note: to match this '\('", lines[3])
+        if parens_match:
+            match_line = parens_match.group(2)
+            n = 4
 
     response = [
         "Make sure that all opening parentheses `(` are matched with a closing parenthesis" \
