@@ -2,6 +2,9 @@
 
 int main(void) {
   int x = 2;
-  int x = 28;
+  do {
+    int x = 28;
+    x++;
+  } while (x < 30);
   printf("%d\n", x);
 }

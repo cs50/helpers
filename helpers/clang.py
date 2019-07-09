@@ -233,7 +233,7 @@ def declaration_shadows_local_var(lines):
         if for_loop:
             response.append("If you meant to create a `for` loop, be sure that each part of the `for` loop is separated " \
                                 "with a semicolon rather than a comma.")
-                                
+
             if (len(lines) >= 3 and re.search(r"^\s*\^$", lines[2])):
                 return lines[0:3], response
 
@@ -260,7 +260,7 @@ def declaration_shadows_local_var(lines):
                         "hasn't been used yet.")
 
     if len(lines) >= 4 and prev_declaration_line != None:
-        return lines[0:7], response if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else lines[0:4], response
+        return (lines[0:7], response) if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else (lines[0:4], response)
 
     if len(lines) >= 2:
         return lines[0:2], response
