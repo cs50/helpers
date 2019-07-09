@@ -501,6 +501,28 @@ def expected_while_in_do_while(lines):
 
 
 @helper("clang")
+def expression_result_unused(lines):
+    """
+      >>> bool(expression_result_unused([                                             \
+              "foo.c:6:16: error: expression result unused [-Werror,-Wunused-value]", \
+              "n*12;",                                                                \
+              " ^ 1 error generated."                                                 \
+          ]))
+      True
+    """
+    matches = _match(r"expression result unused", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "On line {} of `{}` you are performing an operation, but not saving the result.".format(matches.line, matches.file),
+        "Did you mean to print or store the result in a variable?"
+    ]
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
