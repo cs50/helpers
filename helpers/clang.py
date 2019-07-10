@@ -648,7 +648,7 @@ def fmt_string_not_string_literal(lines):
         line = matches.line
         file = matches.file
         matches = re.search(r"^(.?printf|.?scanf)\s*\(", lines[1][lines[2].index("^"):])
-        print(lines[1][lines[2].index("^"):])
+        # print(lines[1][lines[2].index("^"):])
         if matches:
             response = [
                 "The first argument to `{}` on line {} of `{}` should be a double-quoted " \
