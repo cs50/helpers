@@ -554,6 +554,30 @@ def extra_tokens_at_end_of_include(lines):
 
 
 @helper("clang")
+def extraneous_closing_brace(lines):
+    """
+      >>> bool(extraneous_closing_brace([                          \
+              "foo.c:21:1: error: extraneous closing brace ('}')", \
+              "}",                                                 \
+              "^"                                                  \
+          ]))
+      True
+    """
+    matches = _match(r"extraneous closing brace \('}'\)", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "You seem to have an unnecessary `}}` on line {} of `{}`.".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 3 and re.search(r"^\s*\^\s*$", lines[2]):
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def extraneous_closing_parens(lines):
     """
       >>> bool(extraneous_closing_parens([                              \
