@@ -554,9 +554,9 @@ def extra_tokens_at_end_of_include(lines):
 
 
 @helper("clang")
-def extraneous_parens(lines):
+def extraneous_closing_parens(lines):
     """
-      >>> bool(extraneous_parens([                                      \
+      >>> bool(extraneous_closing_parens([                              \
               "foo.c:1:19: error: extraneous ')' before ';' [-Werror]", \
               "digit = (number % (tracker)) / (tracker/10));",          \
               "                                           ^"            \
