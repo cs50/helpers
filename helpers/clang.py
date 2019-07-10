@@ -635,12 +635,12 @@ def file_not_found_include(lines):
 @helper("clang")
 def fmt_string_not_string_literal(lines):
     """
-      >>> bool(fmt_string_not_string_literal([                                                   \
+      >>> fmt_string_not_string_literal([                                                   \
               "foo.c:6:16: error: format string is not a string literal (potentially insecure) " \
                   "[-Werror,-Wformat-security]",                                                 \
               "printf(c);",                                                                      \
               "^ 1 error generated."                                                             \
-          ]))
+          ])
       True
     """
     matches = _match(r"format string is not a string literal", lines[0])
