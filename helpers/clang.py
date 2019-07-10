@@ -633,6 +633,32 @@ def file_not_found_include(lines):
 
 
 @helper("clang")
+def fmt_string_not_string_literal(lines):
+    """
+      >>> bool(fmt_string_not_string_literal([                                                   \
+              "foo.c:6:16: error: format string is not a string literal (potentially insecure) " \
+                  "[-Werror,-Wformat-security]",                                                 \
+              "printf(c);",                                                                      \
+              "^ 1 error generated."                                                             \
+          ]))
+      True
+    """
+    matches = _match(r"format string is not a string literal", lines[0])
+    if matches and len(lines) >= 3 and re.search(r"^\s*\^", lines[2]):
+        line = matches.line
+        file = matches.file
+        matches = re.search(r"^(.?printf|.?scanf)\s*\(", lines[1][lines[2].index("^"):])
+        print(lines[1][lines[2].index("^"):])
+        if matches:
+            response = [
+                "The first argument to `{}` on line {} of `{}` should be a double-quoted " \
+                    "string.".format(matches.group(1), line, file)
+
+            ]
+            return lines[0:2], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
