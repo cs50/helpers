@@ -603,6 +603,36 @@ def extraneous_closing_parens(lines):
 
 
 @helper("clang")
+def file_not_found_include(lines):
+    """
+      >>> bool(file_not_found_include([                              \
+              "foo.c:1:10: fatal error: 'studio.h' file not found", \
+              "#include <studio.h>",                                \
+              "         ^"                                          \
+          ]))
+      True
+    """
+    matches = _match(r"'(.*)' file not found", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like you're trying to `#include` a file (`{}`) on line {} of `{}` which " \
+            "does not exist.".format(matches.group[0], matches.line, matches.file)
+    ]
+
+    if matches.group[0] in ["studio.h"]:
+        response.append("Did you mean to `#include <stdio.h>` (without the `u`)?")
+    else:
+        response.append("Check to make sure you spelled the filename correctly.")
+
+    if len(lines) >= 2 and re.search(r"#include", lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> bool(invalid_append_string([                                                                                    \
