@@ -653,7 +653,7 @@ def file_not_found_include(lines):
 
     return lines[0:1], response
 
-
+# Currently not working
 @helper("clang")
 def fmt_string_not_string_literal(lines):
     """
@@ -669,8 +669,10 @@ def fmt_string_not_string_literal(lines):
     if matches and len(lines) >= 3 and re.search(r"^\s*\^", lines[2]):
         line = matches.line
         file = matches.file
+
         backtrack = len("vsnprintf(") # the longest possible variant of printf
-        matches = re.search(r"(\w*printf|\w*scanf)\s*\(", lines[1][lines[2].index("^") - backtrack:])
+        start = max(lines[2].index("^") - backtrack, 0)
+        matches = re.search(r"(\w*printf|\w*scanf)\s*\(", lines[1][start:])
         if matches:
             response = [
                 "The first argument to `{}` on line {} of `{}` should be a double-quoted " \
