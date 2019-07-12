@@ -683,6 +683,65 @@ def fmt_string_not_string_literal(lines):
 
 
 @helper("clang")
+def has_empty_body(lines):
+    """
+      >>> "removing the semicolon directly" in has_empty_body([                         \
+              "foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]", \
+              "  if (n > 0);",                                                          \
+              "            ^"                                                           \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"(if statement|while loop|for loop) has empty body", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of " \
+            "`{}`.".format(matches.group[0],matches.line, matches.file)
+    ]
+
+    if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
+def ignoring_return_value(lines):
+    """
+      >>> "calling `round`" in ignoring_return_value([                                                \
+              "round.c:17:5: error: ignoring return value of function declared with const attribute " \
+                  "[-Werror,-Wunused-value]",                                                         \
+              "round(cents);",                                                                        \
+              "^~~~~ ~~~~~"                                                                           \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"ignoring return value of function declared with (.+) attribute", lines[0])
+    if not matches:
+        return
+
+    function = _caret_extract(lines[1:3])
+    if function:
+        response = [
+            "You seem to be calling `{}` on line {} of `{}` but aren't using its " \
+                "return value.".format(function, matches.line, matches.file),
+            "Did you mean to assign it to a variable?"
+        ]
+
+        return lines[0:3], response
+
+    response = [
+        "You seem to be calling a function on line {} of `{}` but aren't using its " \
+            "return value.".format(matches.line, matches.file),
+        "Did you mean to assign it to a variable?"
+    ]
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> "concatenate values and strings in C" in invalid_append_string([                                                \
