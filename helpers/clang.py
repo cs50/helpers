@@ -758,16 +758,22 @@ def implicit_declaration_of_fun(lines):
 
     response = [
         "You seem to have an error in `{}` on line {}.".format(matches.file, matches.line),
-        "By \"implicit declaration of function '{}'\", `clang` means that it doesn't recognize `{}`.".format(matches.group[0], matches.group[0])
+        "By \"implicit declaration of function '{}'\", `clang` means that it doesn't recognize " \
+            "`{}`.".format(matches.group[0], matches.group[0])
     ]
 
-    if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string", "GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
-        response.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop your file?".format(matches.group[0]))
+    if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long",
+                            "get_string", "GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong",
+                            "GetString"]:
+        response.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop " \
+            "your file?".format(matches.group[0]))
     elif matches.group[0] in ["crypt"]:
-        response.append("Did you forget to `#include <unistd.h>` (in which `{}` is declared) atop your file?".format(matches.group[0]))
+        response.append("Did you forget to `#include <unistd.h>` (in which `{}` is declared) atop " \
+            "your file?".format(matches.group[0]))
         response.append("Do you have `#define _XOPEN_SOURCE` above, not below, `#include <unistd.h>`?")
     else:
-        response.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group[0]))
+        response.append("Did you forget to `#include` the header file in which `{}` is declared atop " \
+            "your file?".format(matches.group[0]))
         response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group[0], matches.file))
 
     if len(lines) >= 2 and re.search(matches.group[0], lines[1]):
