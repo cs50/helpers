@@ -973,6 +973,35 @@ def invalid_preprocessing_directive(lines):
 
 
 @helper("clang")
+def main_must_return_int(lines):
+    """
+      >>> "type of `void`" in main_must_return_int([        \
+              "foo.c:3:1: error: 'main' must return 'int'", \
+              "void main(void)",                            \
+              "^~~~",                                       \
+              "int"                                         \
+          ])[1][1]
+      True
+    """
+    matches = _match(r"'main' must return 'int'", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Your `main` function (declared on line {} of `{}`) must have a return " \
+            "type `int`.".format(matches.line, matches.file)
+    ]
+
+    cur_type = _caret_extract(lines[1:3])
+    if len(lines) >= 3 and cur_type:
+        response.append("Right now, it has a return type of `{}`.".format(cur_type))
+
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def missing_parens(lines):
     """
       >>> "call `get_float`" in missing_parens([                                              \
