@@ -812,6 +812,38 @@ def implicitly_declaring_lib_fun(lines):
 
 
 @helper("clang")
+def incompatible_conversion(lines):
+    # foo.c:3:8: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char [3]'
+    #       [-Werror,-Wint-conversion]
+    #    int x = "28";
+    #        ^   ~~~~
+    """
+      >>> "By \\"incompatible conversion\\"," in incompatible_conversion([                                             \
+              "foo.c:3:8: error: incompatible pointer to integer conversion initializing 'int' with an expression of " \
+                  "type 'char [3]'",                                                                                   \
+              "      [-Werror,-Wint-conversion]",                                                                      \
+              "   int x = \\"28\\";",                                                                                  \
+              "       ^   ~~~~"                                                                                        \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"incompatible (.+) to (.+) conversion", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "By \"incompatible conversion\", `clang` means that you are assigning a value to a variable of a different type " \
+            "on line {} of `{}`. Try ensuring that your value is of " \
+            "type `{}`.".format(matches.line, matches.file, matches.group[1])
+    ]
+
+    if len(lines) >= 2 and re.search(r"=", lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> "concatenate values and strings in C" in invalid_append_string([                                                \
