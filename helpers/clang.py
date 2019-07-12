@@ -920,6 +920,29 @@ def invalid_append_string(lines):
 
 
 @helper("clang")
+def invalid_equals(lines):
+    """
+      >>> "comparing two values for equality" in invalid_equals([                         \
+              "foo.c:8:19: error: invalid '==' at end of declaration; did you mean '='?", \
+              "   for(int i == 0; i < height; i++)",                                      \
+              "             ^~",                                                          \
+              "             ="                                                            \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"invalid '==' at end of declaration; did you mean '='?", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like you may have used '==' (which is used for comparing two values for equality) instead of '=' (which " \
+            "is used to assign a value to a variable) on line {} of `{}`?".format(matches.line, matches.file)
+    ]
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def missing_parens(lines):
     """
       >>> "call `get_float`" in missing_parens([                                              \
