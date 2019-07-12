@@ -742,6 +742,41 @@ def ignoring_return_value(lines):
 
 
 @helper("clang")
+def implicit_declaration_of_fun(lines):
+    """
+      >>> "implicit declaration of function" in implicit_declaration_of_fun([                    \
+              "foo.c:5:12: error: implicit declaration of function 'get_int' is invalid in C99 " \
+                  "[-Werror,-Wimplicit-function-declaration]",                                   \
+              "   int x = get_int();",                                                           \
+              "           ^"                                                                     \
+          ])[1][1]
+      True
+    """
+    matches = _match(r"implicit declaration of function '([^']+)' is invalid", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "You seem to have an error in `{}` on line {}.".format(matches.file, matches.line),
+        "By \"implicit declaration of function '{}'\", `clang` means that it doesn't recognize `{}`.".format(matches.group[0], matches.group[0])
+    ]
+
+    if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string", "GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
+        response.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop your file?".format(matches.group[0]))
+    elif matches.group[0] in ["crypt"]:
+        response.append("Did you forget to `#include <unistd.h>` (in which `{}` is declared) atop your file?".format(matches.group[0]))
+        response.append("Do you have `#define _XOPEN_SOURCE` above, not below, `#include <unistd.h>`?")
+    else:
+        response.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group[0]))
+        response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group[0], matches.file))
+
+    if len(lines) >= 2 and re.search(matches.group[0], lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> "concatenate values and strings in C" in invalid_append_string([                                                \
