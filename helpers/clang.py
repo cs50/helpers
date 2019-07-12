@@ -943,6 +943,36 @@ def invalid_equals(lines):
 
 
 @helper("clang")
+def invalid_preprocessing_directive(lines):
+    """
+      >>> "you've used a preprocessor" in invalid_preprocessing_directive([ \
+              "foo.c:1:2: error: invalid preprocessing directive",          \
+              "#incalude <stdio.h>",                                        \
+              " ^"                                                          \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"invalid preprocessing directive", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "By \"invalid preprocesing directive\", `clang` means that you've used a preprocessor command on line {} " \
+            "(a command beginning with #) that is not recognized.".format(matches.file)
+    ]
+
+    if len(lines) >= 2:
+        directive = re.search(r"^([^' ]+)", lines[1])
+        if directive:
+            response.append("Check to make sure that `{}` is a valid directive (like `#include`) and is spelled " \
+                "correctly.".format(directive.group(1)))
+
+            return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def missing_parens(lines):
     """
       >>> "call `get_float`" in missing_parens([                                              \
