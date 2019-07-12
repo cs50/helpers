@@ -1058,6 +1058,39 @@ def more_conversions_than_data_args(lines):
 
 
 @helper("clang")
+def multiple_unsequenced_modifications(lines):
+    """
+      >>> "the variable `space`" in multiple_unsequenced_modifications([                                  \
+              "foo.c:1:10: error: multiple unsequenced modifications to 'space' [-Werror,-Wunsequenced]", \
+              " space = space--;",                                                                        \
+              "       ~      ^"                                                                           \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"multiple unsequenced modifications to '(.*)'", lines[0])
+    if not matches:
+        return
+
+    variable = matches.group[0]
+    response = [
+        "Looks like you're changing the variable `{}` multiple times in a row on line {} of " \
+            "`{}`.".format(variable, matches.line, matches.file)
+    ]
+
+    if len(lines) >= 2:
+        file = matches.file
+        line = matches.line
+        matches = re.search(r"(--|\+\+)", lines[1])
+        if matches:
+            response.append("When using the `{}` operator, there is no need to assign the result to the variable. Try " \
+                "using just `{}{}` instead".format(matches.group(1), variable, matches.group(1)))
+
+            return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def self_initialization(lines):
     """
       >>> "both the left- and right-hand" in self_initialization([                                         \
