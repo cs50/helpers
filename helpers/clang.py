@@ -813,10 +813,6 @@ def implicitly_declaring_lib_fun(lines):
 
 @helper("clang")
 def incompatible_conversion(lines):
-    # foo.c:3:8: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char [3]'
-    #       [-Werror,-Wint-conversion]
-    #    int x = "28";
-    #        ^   ~~~~
     """
       >>> "By \\"incompatible conversion\\"," in incompatible_conversion([                                             \
               "foo.c:3:8: error: incompatible pointer to integer conversion initializing 'int' with an expression of " \
@@ -839,6 +835,29 @@ def incompatible_conversion(lines):
 
     if len(lines) >= 2 and re.search(r"=", lines[1]):
         return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
+def index_out_of_bounds(lines):
+    """
+      >>> "but that location is" in index_out_of_bounds([                           \
+              "foo.c:7:5: runtime error: index 2 out of bounds for type 'int [2]'", \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"index (-?\d+) out of bounds for type '.+'", lines[0])
+    if not matches:
+        return
+
+    response = []
+    if int(matches.group[0]) < 0:
+        response.append("Looks like you're to access location {} of an array on line {} of `{}`, but that location is " \
+            "before the start of the array.".format(matches.group[0], matches.line, matches.file))
+    else:
+        response.append("Looks like you're to access location {} of an array on line {} of `{}`, but that location is " \
+            "past the end of the array.".format(matches.group[0], matches.line, matches.file, matches.group[0]))
 
     return lines[0:1], response
 
