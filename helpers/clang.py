@@ -1033,6 +1033,31 @@ def missing_parens(lines):
 
 
 @helper("clang")
+def more_conversions_than_data_args(lines):
+    """
+      >>> "too many format codes" in more_conversions_than_data_args([                         \
+              "foo.c:5:16: error: more '%' conversions than data arguments [-Werror,-Wformat]" \
+              "   printf(\\"%d %d\\n\\", 28);",                                                \
+              "              ~^"                                                               \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"more '%' conversions than data arguments", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "You have too many format codes in your format string on line {} of `{}`.".format(matches.line, matches.file),
+        "Be sure that the number of format codes equals the number of additional arguments."
+    ]
+
+    if len(lines) >= 2 and re.search(r"%", lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def self_initialization(lines):
     """
       >>> "both the left- and right-hand" in self_initialization([                                         \
