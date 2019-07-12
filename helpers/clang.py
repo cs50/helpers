@@ -80,11 +80,11 @@ def array_subscript(lines):
 @helper("clang")
 def bad_define(lines):
     """
-      >>> bool(bad_define([                                    \
+      >>> "trying to define a constant" in bad_define([        \
               "foo.c:18:1: error: unknown type name 'define'", \
               "define _XOPEN_SOURCE 500",                      \
               "^"                                              \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"unknown type name 'define'", lines[0])
@@ -102,11 +102,11 @@ def bad_define(lines):
 @helper("clang")
 def bad_include(lines):
     """
-      >>> bool(bad_include([                                    \
+      >>> "trying to include a header" in bad_include([         \
               "foo.c:18:1: error: unknown type name 'include'", \
               "include <stdio.h>",                              \
               "^"                                               \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match("unknown type name 'include'", lines[0])
@@ -124,11 +124,11 @@ def bad_include(lines):
 @helper("clang")
 def conflicting_types(lines):
     """
-      >>> bool(conflicting_types([                                \
+      >>> "with a different return type" in conflicting_types([   \
               "foo.c:3:12: error: conflicting types for 'round'", \
               "int round(int n);",                                \
               "    ^"                                             \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"conflicting types for '(.*)'", lines[0])
@@ -157,11 +157,11 @@ def conflicting_types(lines):
 @helper("clang")
 def continue_not_in_loop(lines):
     """
-      >>> bool(continue_not_in_loop([                                            \
+      >>> "trying to use `continue`" in continue_not_in_loop([                   \
               "test.c:51:17: error: 'continue' statement not in loop statement", \
               "                 continue;",                                      \
               "                 ^"                                               \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"'continue' statement not in loop statement", lines[0])
@@ -179,11 +179,11 @@ def continue_not_in_loop(lines):
 @helper("clang")
 def control_reaches_non_void(lines):
     """
-      >>> bool(control_reaches_non_void([                                                      \
+      >>> "always return a value" in control_reaches_non_void([                                \
               "foo.c:3:16: warning: control reaches end of non-void function [-Wreturn-type]", \
               "int foo(void) {}",                                                              \
               "               ^"                                                               \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"control (may )?reach(es)? end of non-void function", lines[0])
@@ -201,21 +201,21 @@ def control_reaches_non_void(lines):
 @helper("clang")
 def declaration_shadows_local_var(lines):
     """
-      >>> bool(declaration_shadows_local_var([                                              \
+      >>> "already been declared" in declaration_shadows_local_var([                        \
               "foo.c:6:8: error: declaration shadows a local variable [-Werror,-Wshadow]",  \
               "   int x = 28;",                                                             \
               "       ^",                                                                   \
               "foo.c:5:13: note: previous declaration is here",                             \
               "              int x = 2;",                                                   \
               "                  ^"                                                         \
-          ]))
+          ])[1][0]
       True
 
-      >>> bool(declaration_shadows_local_var([                                              \
+      >>> "separated with a semicolon" in declaration_shadows_local_var([                   \
               "bar.c:5:20: error: declaration shadows a local variable [-Werror,-Wshadow]", \
               "   for (int i = 0, i < 28, i++)",                                            \
               "                   ^"                                                        \
-          ]))
+          ])[1][1]
       True
     """
     matches = _match(r"declaration shadows a local variable", lines[0])
@@ -271,11 +271,11 @@ def declaration_shadows_local_var(lines):
 @helper("clang")
 def div_by_zero(lines):
     """
-      >>> bool(div_by_zero([                                                                   \
+      >>> "trying to divide by `0`" in div_by_zero([                                           \
               "foo.c:5:16: error: division by zero is undefined [-Werror,-Wdivision-by-zero]", \
               "int x = 28 / 0;",                                                               \
               "           ^ ~"                                                                 \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"division by zero is undefined", lines[0])
@@ -288,19 +288,19 @@ def div_by_zero(lines):
     ]
 
     if len(lines) >= 2:
-        return (lines[0:2], response)
+        return lines[0:2], response
 
-    return (lines[0:1], response)
+    return lines[0:1], response
 
 
 @helper("clang")
 def expected_closing_brace(lines):
     """
-      >>> bool(expected_closing_brace([                 \
-              "foo.c:9:2: error: expected '}'",         \
-              "}",                                      \
-              " ^"                                      \
-          ]))
+      >>> "matched with a closing brace" in expected_closing_brace([ \
+              "foo.c:9:2: error: expected '}'",                      \
+              "}",                                                   \
+              " ^"                                                   \
+          ])[1][0]
       True
     """
     matches = _match(r"expected '}'", lines[0])
@@ -317,11 +317,11 @@ def expected_closing_brace(lines):
 @helper("clang")
 def expected_closing_parens(lines):
     """
-      >>> bool(expected_closing_parens([        \
-              "foo.c:6:1: error: expected ')'", \
-              "}",                              \
-              "^"                               \
-          ]))
+      >>> "matched with a closing parenthesis" in expected_closing_parens([ \
+              "foo.c:6:1: error: expected ')'",                             \
+              "}",                                                          \
+              "^"                                                           \
+          ])[1][0]
       True
     """
     matches = _match(r"expected '\)'", lines[0])
@@ -351,11 +351,11 @@ def expected_closing_parens(lines):
 @helper("clang")
 def expected_for_semi_colon(lines):
     """
-      >>> bool(expected_for_semi_colon([                                      \
+      >>> "separate the three components" in expected_for_semi_colon([        \
               "foo.c:5:22: error: expected ';' in 'for' statement specifier", \
               "   for (int i = 0, i < 28, i++)",                              \
               "                     ^"                                        \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"expected ';' in 'for' statement specifier", lines[0])
@@ -376,12 +376,12 @@ def expected_for_semi_colon(lines):
 @helper("clang")
 def expected_identifier_or_parens(lines):
     """
-      >>> bool(expected_identifier_or_parens([                 \
-              "foo.c:1:17: error: expected identifier or '('", \
-              "int main(void); {",                             \
-              "                ^",                             \
-              "1 error generated."                             \
-          ]))
+      >>> "functions start and end" in expected_identifier_or_parens([ \
+              "foo.c:1:17: error: expected identifier or '('",         \
+              "int main(void); {",                                     \
+              "                ^",                                     \
+              "1 error generated."                                     \
+          ])[1][0]
       True
     """
     matches = _match(r"expected identifier or '\('", lines[0])
@@ -402,11 +402,11 @@ def expected_identifier_or_parens(lines):
 @helper("clang")
 def expected_if_open_parens(lines):
     """
-      >>> bool(expected_if_open_parens([                   \
-              "foo.c:6:8: error: expected '(' after 'if'", \
-              "    if x == 28",                            \
-              "       ^"                                   \
-          ]))
+      >>> "enclosing the condition" in expected_if_open_parens([ \
+              "foo.c:6:8: error: expected '(' after 'if'",       \
+              "    if x == 28",                                  \
+              "       ^"                                         \
+          ])[1][0]
       True
     """
     matches = _match(r"expected '\(' after 'if'", lines[0])
@@ -427,11 +427,11 @@ def expected_if_open_parens(lines):
 @helper("clang")
 def expected_param_declarator(lines):
     """
-      >>> bool(expected_param_declarator([                        \
-              "foo.c:3:12: error: expected parameter declarator", \
-              "int square(28);",                                  \
-              "           ^",                                     \
-          ]))
+      >>> "calling it inside of curly" in expected_param_declarator([ \
+              "foo.c:3:12: error: expected parameter declarator",     \
+              "int square(28);",                                      \
+              "           ^",                                         \
+          ])[1][0]
       True
     """
     matches = _match(r"expected parameter declarator", lines[0])
@@ -455,12 +455,12 @@ def expected_param_declarator(lines):
 @helper("clang")
 def expected_semi_colon(lines):
     """
-      >>> bool(expected_semi_colon([                              \
+      >>> "missing a semicolon" in expected_semi_colon([          \
               "foo.c:5:27: error: expected ';' after expression", \
               "   printf(\\"hello, world!\\")",                   \
               "                          ^",                      \
               "                          ;"                       \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"expected ';' (?:after expression|at end of declaration|after do\/while statement)", lines[0])
@@ -482,11 +482,11 @@ def expected_semi_colon(lines):
 @helper("clang")
 def expected_while_in_do_while(lines):
     """
-      >>> bool(expected_while_in_do_while([                          \
-              "foo.c:9:1: error: expected 'while' in do/while loop", \
-              "}",                                                   \
-              "^"                                                    \
-          ]))
+      >>> "trying to create a `do/while`" in expected_while_in_do_while([ \
+              "foo.c:9:1: error: expected 'while' in do/while loop",      \
+              "}",                                                        \
+              "^"                                                         \
+          ])[1][0]
       True
     """
     matches = _match(r"expected 'while' in do/while loop", lines[0])
@@ -503,11 +503,11 @@ def expected_while_in_do_while(lines):
 @helper("clang")
 def expression_not_int_const(lines):
     """
-      >>> bool(expression_not_int_const([                                            \
+      >>> "each `case` in a `switch`" in expression_not_int_const([                  \
               "foo.c:7:15: error: expression is not an integer constant expression", \
               "        case (x > 28):",                                              \
               "             ~^~~~~~~"                                                \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"expression is not an integer constant expression", lines[0])
@@ -525,11 +525,11 @@ def expression_not_int_const(lines):
 @helper("clang")
 def expression_result_unused(lines):
     """
-      >>> bool(expression_result_unused([                                             \
+      >>> "operation, but not saving" in expression_result_unused([                   \
               "foo.c:6:16: error: expression result unused [-Werror,-Wunused-value]", \
               "n*12;",                                                                \
               " ^ 1 error generated."                                                 \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"expression result unused", lines[0])
@@ -547,7 +547,7 @@ def expression_result_unused(lines):
 @helper("clang")
 def extra_tokens_at_end_of_include(lines):
     """
-      >>> "removing the `c`" in extra_tokens_at_end_of_include([                                                        \
+      >>> "removing the `c`" in extra_tokens_at_end_of_include([                                       \
               "foo.c:1:19: error: extra tokens at end of #include directive [-Werror,-Wextra-tokens]", \
               "#include <stdio.h>c",                                                                   \
               "                  ^"                                                                    \
@@ -578,11 +578,11 @@ def extra_tokens_at_end_of_include(lines):
 @helper("clang")
 def extraneous_closing_brace(lines):
     """
-      >>> bool(extraneous_closing_brace([                          \
+      >>> "have an unnecessary" in extraneous_closing_brace([      \
               "foo.c:21:1: error: extraneous closing brace ('}')", \
               "}",                                                 \
               "^"                                                  \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"extraneous closing brace \('}'\)", lines[0])
@@ -602,11 +602,11 @@ def extraneous_closing_brace(lines):
 @helper("clang")
 def extraneous_closing_parens(lines):
     """
-      >>> bool(extraneous_closing_parens([                              \
+      >>> "have an extra parenthesis" in extraneous_closing_parens([    \
               "foo.c:1:19: error: extraneous ')' before ';' [-Werror]", \
               "digit = (number % (tracker)) / (tracker/10));",          \
               "                                           ^"            \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"extraneous '\)' before ';'", lines[0])
@@ -627,11 +627,11 @@ def extraneous_closing_parens(lines):
 @helper("clang")
 def file_not_found_include(lines):
     """
-      >>> bool(file_not_found_include([                              \
+      >>> "trying to `#include`" in file_not_found_include([        \
               "foo.c:1:10: fatal error: 'studio.h' file not found", \
               "#include <studio.h>",                                \
               "         ^"                                          \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"'(.*)' file not found", lines[0])
@@ -657,12 +657,12 @@ def file_not_found_include(lines):
 @helper("clang")
 def fmt_string_not_string_literal(lines):
     """
-      >>> bool(fmt_string_not_string_literal([                                                   \
+      >>> "double-quoted string" in fmt_string_not_string_literal([                              \
               "foo.c:6:16: error: format string is not a string literal (potentially insecure) " \
                   "[-Werror,-Wformat-security]",                                                 \
               "printf(c);",                                                                      \
               "       ^"                                                                         \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"format string is not a string literal", lines[0])
@@ -685,10 +685,10 @@ def fmt_string_not_string_literal(lines):
 @helper("clang")
 def invalid_append_string(lines):
     """
-      >>> bool(invalid_append_string([                                                                                    \
+      >>> "concatenate values and strings in C" in invalid_append_string([                                                \
               "test.c:6:15: error: adding 'char' to a string does not append to the string [-Werror, -Wstring-plus-int]", \
               "    printf(\"\" + c);"                                                                                     \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"adding '(.+)' to a string does not append to the string", lines[0])
@@ -743,12 +743,12 @@ def missing_parens(lines):
 @helper("clang")
 def self_initialization(lines):
     """
-      >>> bool(self_initialization([                                                                       \
+      >>> "both the left- and right-hand" in self_initialization([                                         \
               "water.c:8:15: error: variable 'x' is uninitialized when used within its own initialization" \
               " [-Werror,-Wuninitialized]",                                                                \
               "int x= 12*x;",                                                                              \
               "     ~     ^"                                                                               \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"variable '(.+)' is uninitialized when used within its own initialization", lines[0])
@@ -770,11 +770,11 @@ def self_initialization(lines):
 @helper("clang")
 def unknown_type(lines):
     """
-      >>> bool(unknown_type([                              \
+      >>> "type, even though" in unknown_type([            \
               "foo.c:1:1: error: unknown type name 'bar'", \
               "bar baz",                                   \
               "^"                                          \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"unknown type name '(.+)'", lines[0])
@@ -806,11 +806,11 @@ def unknown_type(lines):
 @helper("clang")
 def unused_arg_in_fmt_string(lines):
     """
-      >>> bool(unused_arg_in_fmt_string([                                                                 \
+      >>> "more arguments" in unused_arg_in_fmt_string([                                                  \
               "foo.c:5:29: error: data argument not used by format string [-Werror,-Wformat-extra-args]", \
               "    printf(\\"%d %d\\", 27, 28, 29);",                                                     \
               "           ~~~~~~~          ^"                                                             \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"data argument not used by format string", lines[0])
@@ -833,11 +833,11 @@ def unused_arg_in_fmt_string(lines):
 @helper("clang")
 def unused_var(lines):
     """
-      >>> bool(unused_var([                                                        \
+      >>> "never used in your program" in unused_var([                             \
               "foo.c:6:9: error: unused variable 'x' [-Werror,-Wunused-variable]", \
               "    int x = 28;",                                                   \
               "        ^"                                                          \
-          ]))
+          ])[1][0]
       True
     """
     matches = _match(r"unused variable '([^']+)'", lines[0])
