@@ -783,6 +783,35 @@ def implicit_declaration_of_fun(lines):
 
 
 @helper("clang")
+def implicitly_declaring_lib_fun(lines):
+    """
+      >>> "Did you forget to" in implicitly_declaring_lib_fun([                                                       \
+              "foo.c:3:4: error: implicitly declaring library function 'printf' with type 'int (const char *, ...)' " \
+                  "[-Werror]",                                                                                        \
+              "   printf(\\"hello, world!\\");",                                                                      \
+              "   ^"                                                                                                  \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"implicitly declaring library function '([^']+)'", lines[0])
+    if not matches:
+        return
+
+    if matches.group[0] in ["printf"]:
+        response = ["Did you forget to `#include <stdio.h>` (in which `printf` is declared) atop your file?"]
+    elif matches.group[0] in ["malloc"]:
+        response = ["Did you forget to `#include <stdlib.h>` (in which `malloc` is declared) atop your file?"]
+    else:
+        response = ["Did you forget to `#include` the header file in which `{}` is declared atop " \
+            "your file?".format(matches.group[0])]
+
+    if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def invalid_append_string(lines):
     """
       >>> "concatenate values and strings in C" in invalid_append_string([                                                \
