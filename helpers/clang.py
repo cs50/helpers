@@ -653,7 +653,37 @@ def file_not_found_include(lines):
 
     return lines[0:1], response
 
-# Currently not working
+
+# TODO: pattern match on argument's type
+@helper("clang")
+def fmt_specifies_type(lines):
+    """
+      >>> "correct format code" in fmt_specifies_type([                                                               \
+              "foo.c:5:19: error: format specifies type 'int' but the argument has type 'char *' [-Werror,-Wformat]", \
+              "   printf(\\"%d\\n\\", \\"hello!\\");",                                                                \
+              "           ~~     ^~~~~~~~",                                                                           \
+              "           %s"                                                                                         \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"format specifies type '[^:]+' but the argument has type '[^:]+'", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Be sure to use the correct format code (e.g., `%i` for integers, `%f` for floating-point values, `%s` for " \
+            "strings, etc.) in your format string on line {} of `{}`.".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 3 and re.search(r"\^", lines[2]):
+        if len(lines) >= 4 and re.search(r"%", lines[3]):
+            return lines[0:4], response
+
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
 @helper("clang")
 def fmt_string_not_string_literal(lines):
     """
