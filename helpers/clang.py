@@ -1091,6 +1091,29 @@ def multiple_unsequenced_modifications(lines):
 
 
 @helper("clang")
+def one_param_on_main_dec(lines):
+    """
+      >>> "be `int main(void)` or" in one_param_on_main_dec([                               \
+              "foo.c:6:5: error: only one parameter on 'main' declaration [-Werror,-Wmain]" \
+              "int main(int x)",                                                            \
+              "    ^"                                                                       \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"only one parameter on 'main' declaration", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like your declaration of `main` on line {} of `{}` isn't quite right. The declaration of `main` should " \
+            "be `int main(void)` or `int main(int argc, string argv[])` or some " \
+            "equivalent.".format(matches.line, matches.file)
+    ]
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def self_initialization(lines):
     """
       >>> "both the left- and right-hand" in self_initialization([                                         \
