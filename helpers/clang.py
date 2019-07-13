@@ -1093,10 +1093,10 @@ def multiple_unsequenced_modifications(lines):
 @helper("clang")
 def one_param_on_main_dec(lines):
     """
-      >>> "be `int main(void)` or" in one_param_on_main_dec([                               \
-              "foo.c:6:5: error: only one parameter on 'main' declaration [-Werror,-Wmain]" \
-              "int main(int x)",                                                            \
-              "    ^"                                                                       \
+      >>> "be `int main(void)` or" in one_param_on_main_dec([                                \
+              "foo.c:6:5: error: only one parameter on 'main' declaration [-Werror,-Wmain]", \
+              "int main(int x)",                                                             \
+              "    ^"                                                                        \
           ])[1][0]
       True
     """
