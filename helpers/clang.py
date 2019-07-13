@@ -1114,6 +1114,33 @@ def one_param_on_main_dec(lines):
 
 
 @helper("clang")
+def relational_comp_res_unused(lines):
+    """
+      >>> "comparing two values" in relational_comp_res_unused([                                         \
+              "mario.c:12:19: error: relational comparison result unused [-Werror,-Wunused-comparison]", \
+              "    while (height < 0, height < 23);",                                                    \
+              "           ~~~~~~~^~~",                                                                   \
+              "1 error generated.",                                                                      \
+              "make: *** [mario] Error 1"                                                                \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"relational comparison result unused", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like you're comparing two values on line {} of `{}` but not using the " \
+            "result?".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 3 and _has_caret(lines[2]):
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def self_initialization(lines):
     """
       >>> "both the left- and right-hand" in self_initialization([                                         \
