@@ -1278,6 +1278,31 @@ def too_many_args_to_fun_call(lines):
 
 
 @helper("clang")
+def type_specifier_missing(lines):
+    """
+      >>> "specify its return type" in type_specifier_missing([                                       \
+              "foo.c:3:1: error: type specifier missing, defaults to 'int' [-Werror,-Wimplicit-int]", \
+              "square (int x) {",                                                                     \
+              "^"                                                                                     \
+          ])[1][1]
+      True
+    """
+    matches = _match(r"type specifier missing, defaults to 'int'", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like you're trying to declare a function on line {} of `{}`.".format(matches.line, matches.file),
+        "Be sure, when declaring a function, to specify its return type just before its name."
+    ]
+
+    if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def unknown_type(lines):
     """
       >>> "type, even though" in unknown_type([            \
