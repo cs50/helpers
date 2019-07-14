@@ -1218,6 +1218,29 @@ def self_initialization(lines):
     return lines[0:1], response
 
 
+# TODO: extract symbol
+@helper("clang")
+def subscripted_val_not_array(lines):
+    """
+      >>> "index into a variable" in subscripted_val_not_array([                                \
+              "fifteen.c:179:21: error: subscripted value is not an array, pointer, or vector", \
+              "temp = board[d - 1][d - 2];",                                                    \
+              "       ~~~~~^~~~~~"                                                              \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"subscripted value is not an array, pointer, or vector", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like you're trying to index into a variable as though it's an array, even though it isn't, on line " \
+            "{} of `{}`?".format(matches.line, matches.file)
+    ]
+
+    return lines[0:1], response
+
+
 @helper("clang")
 def unknown_type(lines):
     """
