@@ -1351,10 +1351,6 @@ def undefined_reference(lines):
             "Did you try to compile a file that doesn't contain a `main` function?"
         ]
 
-        # $ make helpers
-        # ...
-        # clang: error: linker command failed with exit code 1 (use -v to see invocation)
-        # make: *** [helpers] Error 1
         if len(lines) > 3 and "make: *** [helpers] Error" in lines[2]:
             response.append("Are you compiling a `helpers.c` file instead of the file containing the program itself?")
     else:
@@ -1521,6 +1517,33 @@ def use_of_undeclared_indentifier(lines):
             "check that the variable name is spelled correctly.".format(matches.group[0]))
 
     if len(lines) >= 2 and re.search(matches.file, lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
+def variable_uninitialized(lines):
+    """
+      >>> "trying to use the variable" in variable_uninitialized([                                         \
+              "foo.c:6:20: error: variable 'x' is uninitialized when used here [-Werror,-Wuninitialized]", \
+              "    printf(\\"%d\\n\\", x);",                                                               \
+              "                   ^"                                                                       \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"variable '(.*)' is uninitialized when used here", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "It looks like you're trying to use the variable `{}` on line {} of " \
+            "`{}`.".format(matches.group[0], matches.line, matches.file),
+        "However, on that line, the variable `{}` doesn't have a value yet.".format(matches.group[0]),
+        "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group[0])
+    ]
+
+    if len(lines) >= 2 and re.search(matches.group[0], lines[1]):
         return lines[0:2], response
 
     return lines[0:1], response
