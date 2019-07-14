@@ -7,11 +7,11 @@ from help50 import helper
 @helper("clang")
 def array_bounds(lines):
     """
-      >>> "location 1 of `a`" in array_bounds([                                                           \
-              "test.c:5:20: error: array index 1 is past the end of the array (which contains 1 element)" \
-              "[-Werror,-Warray-bounds]",                                                                 \
-              "    printf(\\"%d\\\\n\\", a[1]);",                                                         \
-              "                   ^ ~"                                                                    \
+      >>> "location 1 of `a`" in array_bounds([                                                            \
+              "test.c:5:20: error: array index 1 is past the end of the array (which contains 1 element) " \
+                  "[-Werror,-Warray-bounds]",                                                              \
+              "    printf(\\"%d\\\\n\\", a[1]);",                                                          \
+              "                   ^ ~"                                                                     \
            ])[1][0]
       True
     """
@@ -1581,9 +1581,6 @@ def void_return(lines):
     ]
 
     return lines[0:1], response
-
-
-#TODO: Copy the rest from help50-server
 
 
 @helper("clang")
