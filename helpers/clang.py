@@ -1242,6 +1242,42 @@ def subscripted_val_not_array(lines):
 
 
 @helper("clang")
+def too_many_args_to_fun_call(lines):
+    """
+      >>> "The function `hashtag`" in too_many_args_to_fun_call([                              \
+              "mario.c:18:17: error: too many arguments to function call, expected 0, have 1", \
+              "        hashtag(x);",                                                           \
+              "        ~~~~~~~ ^"                                                              \
+          ])[1][1]
+      True
+    """
+    matches = _match(r"too many arguments to function call, expected (\d+), have (\d+)", lines[0])
+    if not matches:
+        return
+
+    function = _tilde_extract(lines[1:3]) if len(lines) >= 3 else None
+
+    response = [
+        "You seem to be passing in too many arguments to a function on line {} of `{}`.".format(matches.line, matches.file)
+    ]
+
+    if function:
+        response.append("The function `{}`".format(function))
+    else:
+        response.append("The function")
+
+    response[1] += " is supposed to take {} argument(s), but you're passing it " \
+        "{}.".format(matches.group[0], matches.group[1])
+    response.append("Try providing {} fewer argument(s) to the " \
+        "function.".format(str(int(matches.group[1]) - int(matches.group[0]))))
+
+    if function:
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def unknown_type(lines):
     """
       >>> "type, even though" in unknown_type([            \
