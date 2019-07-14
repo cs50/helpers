@@ -1170,6 +1170,28 @@ def relational_comp_res_unused(lines):
 
 
 @helper("clang")
+def second_param_main_char(lines):
+    """
+      >>> "declaration of `main`" in second_param_main_char([                                               \
+              "caesar.c:5:5: error: second parameter of 'main' (argument array) must be of type 'char **'", \
+              "int main(int argc, int argv[])",                                                             \
+              "    ^"                                                                                       \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"second parameter of 'main' \(argument array\) must be of type 'char \*\*'", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like your declaration of `main` isn't quite right.",
+        "Be sure its second parameter is `string argv[]` or some equivalent!"
+    ]
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def self_initialization(lines):
     """
       >>> "both the left- and right-hand" in self_initialization([                                         \
