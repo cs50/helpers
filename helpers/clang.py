@@ -78,6 +78,32 @@ def array_subscript(lines):
 
 
 @helper("clang")
+def assignment_as_condition(lines):
+    """
+      >>> "try using a double equals" in assignment_as_condition([                                       \
+              "foo.c:6:10: error: using the result of an assignment as a condition without parentheses " \
+                  "[-Werror,-Wparentheses]",                                                             \
+              "   if (x = 28)",                                                                          \
+              "       ~~^~~~"                                                                            \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"using the result of an assignment as a condition without parentheses", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "When checking for equality in the condition on line {} of `{}`, try using a double equals sign (`==`) instead " \
+            "of a single equals sign (`=`).".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def bad_define(lines):
     """
       >>> "trying to define a constant" in bad_define([        \
