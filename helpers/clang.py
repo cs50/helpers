@@ -1303,6 +1303,33 @@ def type_specifier_missing(lines):
 
 
 @helper("clang")
+def unknown_escape_sequence(lines):
+    """
+      >>> "space immediately after" in unknown_escape_sequence([                                        \
+              "water.c:9:21: error: unknown escape sequence '\\ ' [-Werror,-Wunknown-escape-sequence]", \
+              "printf(\\"bottles: %i \\ n\\", shower);",                                                \
+              "                    ^~"                                                                  \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"unknown escape sequence '\\ '", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "Looks like you have a space immediately after a backslash on line {} of `{}` but " \
+            "shouldn't.".format(matches.line, matches.file)
+    ]
+
+    if len(lines) >= 3 and _has_caret(lines[2]):
+        response.append("Did you mean to escape some character?")
+        return lines[0:3], response
+
+    response.append("Did you mean to escape some character?")
+    return lines[0:1], response
+
+
+@helper("clang")
 def unknown_type(lines):
     """
       >>> "type, even though" in unknown_type([            \
