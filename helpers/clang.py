@@ -1441,6 +1441,38 @@ def unused_var(lines):
 
 
 @helper("clang")
+def use_of_undeclared_indentifier(lines):
+    """
+      >>> "hasn't been defined" in use_of_undeclared_indentifier([  \
+              "foo.c:5:4: error: use of undeclared identifier 'x'", \
+              "   x = 28;",                                         \
+              "   ^"                                                \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"use of undeclared identifier '([^']+)'", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "By \"undeclared identifier,\" `clang` means you've used a name `{}` on line {} of `{}` which hasn't been " \
+            "defined.".format(matches.group[0], matches.line, matches.file)
+    ]
+
+    if matches.group[0] in ["true", "false", "bool", "string"]:
+        response.append("Did you forget to `#include <cs50.h>` (in which `{}` is defined) atop your " \
+            "file?".format(matches.group[0]))
+    else:
+        response.append("If you mean to use `{}` as a variable, make sure to declare it by specifying its type, and " \
+            "check that the variable name is spelled correctly.".format(matches.group[0]))
+
+    if len(lines) >= 2 and re.search(matches.file, lines[1]):
+        return lines[0:2], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def void_return(lines):
     """
       >>> "returning `0`" in void_return([                                                      \
