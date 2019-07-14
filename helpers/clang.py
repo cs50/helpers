@@ -1329,6 +1329,54 @@ def type_specifier_missing(lines):
 
 
 @helper("clang")
+def undefined_reference(lines):
+    """
+      >>> "seem to be implemented" in undefined_reference([         \
+              "foo.c:(.text+0x9): undefined reference to `get_int'" \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"undefined reference to `([^']+)'", lines[0], raw=True)
+    if not matches:
+        return
+
+    if matches.group[0] == "main":
+        response = [
+            "Did you try to compile a file that doesn't contain a `main` function?"
+        ]
+
+        # $ make helpers
+        # ...
+        # clang: error: linker command failed with exit code 1 (use -v to see invocation)
+        # make: *** [helpers] Error 1
+        if len(lines) > 3 and "make: *** [helpers] Error" in lines[2]:
+            response.append("Are you compiling a `helpers.c` file instead of the file containing the program itself?")
+    else:
+        response = [
+            "By \"undefined reference,\" `clang` means that you've called a function, `{}`, that doesn't seem to be " \
+                "implemented.".format(matches.group[0]),
+            "If that function has, in fact, been implemented, odds are you've forgotten to tell `clang` to \"link\" " \
+                "against the file that implements `{}`.".format(matches.group[0])
+        ]
+
+        if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long",
+                                "get_string"]:
+            response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, " \
+                "which implements `{}`?".format(matches.group[0]))
+        elif matches.group[0] in ["GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
+            response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, " \
+                "which implements `{}`?".format(matches.group[0]))
+        elif matches.group[0] == "crypt":
+            response.append("Did you forget to compile with -lcrypt in order to link against the crypto library, " \
+                "which implemens `crypt`?")
+        else:
+            response.append("Did you forget to compile with `-lfoo`, where `foo` is the library that defines " \
+                "`{}`?".format(matches.group[0]))
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def unknown_escape_sequence(lines):
     """
       >>> "space immediately after" in unknown_escape_sequence([                                        \
