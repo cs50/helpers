@@ -122,6 +122,35 @@ def bad_include(lines):
 
 
 @helper("clang")
+def comp_str_literal_unspecified(lines):
+    """
+      >>> "compare two strings" in comp_str_literal_unspecified([                                                      \
+              "foo.c:6:14: error: result of comparison against a string literal is unspecified (use strncmp instead) " \
+                  "[-Werror,-Wstring-compare]",                                                                        \
+              "    if (word < \\"twenty-eight\\")",                                                                    \
+              "             ^ ~~~~~~~~~~~~~~"                                                                          \
+          ])[1][0]
+      True
+    """
+    matches = _match(r"result of comparison against a string literal is unspecified", lines[0])
+    if not matches:
+        return
+
+    response = [
+        "You seem to be trying to compare two strings on line {} of `{}`".format(matches.line, matches.file),
+        "You can't compare two strings the same way you would compare two numbers (with `<`, `>`, etc.).",
+        "Did you mean to compare two characters instead? If so, try using single quotation marks around characters " \
+            "instead of double quotation marks.",
+        "If you need to compare two strings, try using the `strcmp` function declared in `string.h`."
+    ]
+
+    if len(lines) >= 3 and _has_caret(lines[2]):
+        return lines[0:3], response
+
+    return lines[0:1], response
+
+
+@helper("clang")
 def conflicting_types(lines):
     """
       >>> "with a different return type" in conflicting_types([   \
