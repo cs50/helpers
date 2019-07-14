@@ -1331,6 +1331,12 @@ def type_specifier_missing(lines):
 @helper("clang")
 def undefined_reference(lines):
     """
+      >>> "Did you try to compile" in undefined_reference([                                     \
+              "foo.c:(.text+0x20): undefined reference to `main'",                              \
+              "clang: error: linker command failed with exit code 1 (use -v to see invocation)" \
+          ])[1][0]
+      True
+
       >>> "seem to be implemented" in undefined_reference([         \
               "foo.c:(.text+0x9): undefined reference to `get_int'" \
           ])[1][0]
