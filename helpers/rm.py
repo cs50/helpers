@@ -1,6 +1,6 @@
 import re
 
-from . import _helpers
+from . import _common
 
 from help50 import helper
 
@@ -18,7 +18,7 @@ def remove_regular_file(lines):
           ])[1][0]
       True
     """
-    matches = re.search(r"^{}rm: remove regular (?:empty )?file ‘(.+)’\?".format(_helpers.FILE_PATH), lines[0])
+    matches = re.search(r"^{}rm: remove regular (?:empty )?file ‘(.+)’\?".format(_common.FILE_PATH), lines[0])
     if not matches:
         return
 
