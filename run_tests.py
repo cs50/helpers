@@ -5,4 +5,3 @@ if __name__ == "__main__":
     for mod in dir(helpers):
         if inspect.ismodule(getattr(helpers, mod)):
             doctest.testmod(getattr(helpers, mod))
-
