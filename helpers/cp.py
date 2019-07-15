@@ -1,6 +1,6 @@
 import re
 
-import regex
+from . import _helpers
 
 from help50 import helper
 
@@ -18,7 +18,7 @@ def overwrite(lines):
           ])[1][0]
       True
     """
-    matches = re.search(r"^{}cp: overwrite ‘(.+)’\?".format(regex.FILE_PATH), lines[0])
+    matches = re.search(r"^{}cp: overwrite ‘(.+)’\?".format(_helpers.FILE_PATH), lines[0])
     if not matches:
         return
 

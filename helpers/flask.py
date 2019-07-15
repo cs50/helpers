@@ -1,6 +1,6 @@
 import re
 
-import regex
+from . import _helpers
 
 from help50 import helper
 

@@ -1,6 +1,6 @@
 import re
 
-import regex
+from . import _helpers
 
 from help50 import helper
 
@@ -13,7 +13,7 @@ def cannot_access(lines):
           ])[1][0]
       True
     """
-    matches = re.search(r"^{}ls: cannot access (.+): No such file or directory".format(regex.FILE_PATH), lines[0])
+    matches = re.search(r"^{}ls: cannot access (.+): No such file or directory".format(_helpers.FILE_PATH), lines[0])
     if not matches:
         return
 
