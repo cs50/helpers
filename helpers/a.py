@@ -50,22 +50,22 @@ def segmentation_fault(lines):
 
 
 # TODO fix doctest
-@helper("a")
-def segmentation_fault_bool(lines):
-    """
-      >>> "store a value other than" in segmentation_fault_bool([ \
-              "Segmentation fault"                                \
-          ])[1][0]
-      True
-    """
-    matches = re.match("^(.+):(\d+):\d+: runtime error: load of value \d+, which is not a valid value for " \
-        "type '_Bool'$", lines[0])
-    if not matches:
-        return
-
-    response = [
-        "Looks like, on line {} of `{}`, you're trying to store a value other than `true` or `false` in " \
-            "a `bool`?".format(matches.group(2), matches.group(1))
-    ]
-
-    return lines[0:1], response
+# @helper("a")
+# def segmentation_fault_bool(lines):
+#     """
+#       >>> "store a value other than" in segmentation_fault_bool([ \
+#               "Segmentation fault"                                \
+#           ])[1][0]
+#       True
+#     """
+#     matches = re.match("^(.+):(\d+):\d+: runtime error: load of value \d+, which is not a valid value for " \
+#         "type '_Bool'$", lines[0])
+#     if not matches:
+#         return
+# 
+#     response = [
+#         "Looks like, on line {} of `{}`, you're trying to store a value other than `true` or `false` in " \
+#             "a `bool`?".format(matches.group(2), matches.group(1))
+#     ]
+# 
+#     return lines[0:1], response
