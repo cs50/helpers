@@ -3,7 +3,7 @@ import re
 from help50 import helper
 
 
-@helper("a")
+@helper("runtime")
 def floating_point_exception(lines):
     """
       >>> "trying to divide a number by 0" in floating_point_exception([ \
@@ -11,7 +11,7 @@ def floating_point_exception(lines):
           ])[1][0]
       True
     """
-    matches = re.match("Floating point exception", lines[0])
+    matches = "Floating point exception" in lines[0]
     if not matches:
         return
 
@@ -25,7 +25,7 @@ def floating_point_exception(lines):
     return lines[0:1], response
 
 
-@helper("a")
+@helper("runtime")
 def segmentation_fault(lines):
     """
       >>> "isn't supposed to access" in segmentation_fault([ \
@@ -33,7 +33,7 @@ def segmentation_fault(lines):
           ])[1][0]
       True
     """
-    matches = re.match("Segmentation fault", lines[0])
+    matches = "Segmentation fault" in lines[0]
     if not matches:
         return
 
@@ -50,11 +50,11 @@ def segmentation_fault(lines):
 
 
 # TODO fix doctest
-# @helper("a")
+# @helper("runtime")
 # def segmentation_fault_bool(lines):
 #     """
 #       >>> "store a value other than" in segmentation_fault_bool([ \
-#               "Segmentation fault"                                \
+#               "Segmentation fault (core dumped)"                  \
 #           ])[1][0]
 #       True
 #     """
