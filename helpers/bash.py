@@ -9,7 +9,7 @@ from help50 import helper
 def cd_no_such_file_or_directory(lines):
     """
       >>> "Are you sure" in cd_no_such_file_or_directory([  \
-              "bash: cd: foo: No such file or directory"    \
+              "bash: cd: baz: No such file or directory"    \
           ])[1][0]
       True
     """
@@ -33,7 +33,7 @@ def cd_not_a_directory(lines):
           ])[1][0]
       True
     """
-    matches = re.search(r"^{}: cd: (.+): Not a directory".format(_common.BASH_PATH), lines[0])
+    matches = re.search(r"^{}: (?:line \d+: )?cd: (.+): Not a directory".format(_common.BASH_PATH), lines[0])
     if not matches:
         return
 
