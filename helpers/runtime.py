@@ -7,7 +7,7 @@ from help50 import helper
 def floating_point_exception(lines):
     """
       >>> "trying to divide a number by 0" in floating_point_exception([ \
-              "Floating point exception"                                 \
+              "Floating point exception (core dumped)"                   \
           ])[1][0]
       True
     """
@@ -29,7 +29,7 @@ def floating_point_exception(lines):
 def segmentation_fault(lines):
     """
       >>> "isn't supposed to access" in segmentation_fault([ \
-              "Segmentation fault"                           \
+              "Segmentation fault (core dumped)"             \
           ])[1][0]
       True
     """
@@ -62,10 +62,10 @@ def segmentation_fault(lines):
 #         "type '_Bool'$", lines[0])
 #     if not matches:
 #         return
-# 
+#
 #     response = [
 #         "Looks like, on line {} of `{}`, you're trying to store a value other than `true` or `false` in " \
 #             "a `bool`?".format(matches.group(2), matches.group(1))
 #     ]
-# 
+#
 #     return lines[0:1], response
