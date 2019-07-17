@@ -11,8 +11,7 @@ def no_rule_to_make(lines):
           ])[1][0]
       True
     """
-    matches = re.search(r"^make: \*\*\* No rule to make target `(.+)'.  Stop.", lines[0])
-    #print(matches, lines[0])
+    matches = re.search(r"^make: \*\*\* No rule to make target '(.+)'.  Stop.", lines[0])
     if not matches:
         return
 
@@ -99,11 +98,11 @@ def success(lines):
 def up_to_date(lines):
     """
       >>> "you already compiled" in up_to_date([ \
-              "make: `foo' is up to date."       \
+              "make: 'foo' is up to date."       \
           ])[1][0]
       True
     """
-    matches = re.search(r"^make: `(.+)' is up to date.", lines[0])
+    matches = re.search(r"^make: '(.+)' is up to date.", lines[0])
     if not matches:
         return
 
