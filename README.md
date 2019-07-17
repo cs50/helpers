@@ -1,3 +1,8 @@
 # helpers
 
-Helpers used by the new help50 rewrite
+Helpers used by help50 v3+
+
+
+# Contributing
+ 
+TODO
