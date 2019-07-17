@@ -7,11 +7,12 @@ from help50 import helper
 def no_rule_to_make(lines):
     """
       >>> "actually have" in no_rule_to_make([                 \
-              "make: *** No rule to make target `foo'.  Stop." \
+              "make: *** No rule to make target 'foo'.  Stop." \
           ])[1][0]
       True
     """
     matches = re.search(r"^make: \*\*\* No rule to make target `(.+)'.  Stop.", lines[0])
+    #print(matches, lines[0])
     if not matches:
         return
 

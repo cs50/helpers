@@ -290,8 +290,6 @@ def use_of_uninitialized_val(lines):
               "==4412== Use of uninitialised value of size 8"                                 \
           ])[1][0]
       True
-    (void) foo;
-  }
     """
     # check for recognized output
     if not re.search(r"^==\d+== Memcheck, a memory error detector$", lines[0]):
