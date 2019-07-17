@@ -287,9 +287,11 @@ def use_of_uninitialized_val(lines):
                "==4412==",                                                                    \
                "",                                                                            \
                " ptr = [Linux]",                                                              \
-              "==4412== Use of uninitialized value of size 8"                                 \
+              "==4412== Use of uninitialised value of size 8"                                 \
           ])[1][0]
       True
+    (void) foo;
+  }
     """
     # check for recognized output
     if not re.search(r"^==\d+== Memcheck, a memory error detector$", lines[0]):
@@ -299,7 +301,7 @@ def use_of_uninitialized_val(lines):
     for i, line in enumerate(lines):
 
         # Use of uninitialized value of size 8
-        matches = re.search(r"^==\d+== Use of uninitialized value of size ([\d,]+)$", line)
+        matches = re.search(r"^==\d+== Use of uninitialised value of size ([\d,]+)$", line)
         if not matches:
             continue
 
@@ -331,7 +333,8 @@ def _frame_extract(lines):
     for line in lines:
         matches = re.search(r"^==\d+==    (?:at|by) (0x[0-9A-Fa-f]+): (.+) \((.+?)(?::(\d+))?\)", line)
         if matches:
-            frames.append(Frame(address=matches.group(1), function=matches.group(2), file=matches.group(3), line=matches.group(4)))
+            frames.append(Frame(address=matches.group(1), function=matches.group(2), file=matches.group(3),
+                                line=matches.group(4)))
         else:
             break
 
