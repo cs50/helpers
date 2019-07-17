@@ -1,3 +1,5 @@
+# Run this script to check doctests
+
 if __name__ == "__main__":
     import doctest
     import helpers
