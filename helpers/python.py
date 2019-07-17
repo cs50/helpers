@@ -53,11 +53,12 @@ def env_var_not_set(lines):
     # iterate over lines ourselves
     for i, line in enumerate(lines):
 
+        # matches = re.search(r"^KeyError|RuntimeError: (API_KEY|API_SECRET) not set$", line)
         matches = re.search(r"^RuntimeError: (API_KEY|API_SECRET) not set$", line)
         if matches:
             response = [
                 "`{}`, an environment variable, doesn't appear to be set, at least not in this " \
-                    "tab".format(matches.group(1)),
+                    "tab.".format(matches.group(1)),
                 "Odds are you need to run `export {}=value`, where `value` is `{}`'s intended " \
                     "value.".format(matches.group(1), matches.group(1))
             ]
