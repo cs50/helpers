@@ -847,7 +847,7 @@ def implicit_declaration_of_fun(lines):
             "`{}`.".format(matches.group[0], matches.group[0])
     ]
 
-    if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long",
+    if matches.group[0] in ["get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long",
                             "get_string", "GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong",
                             "GetString"]:
         response.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop " \
@@ -856,6 +856,8 @@ def implicit_declaration_of_fun(lines):
         response.append("Did you forget to `#include <unistd.h>` (in which `{}` is declared) atop " \
             "your file?".format(matches.group[0]))
         response.append("Do you have `#define _XOPEN_SOURCE` above, not below, `#include <unistd.h>`?")
+    elif matches.group[0] in ["eprintf"]:
+        response.append("The function `eprintf` has been deprecated and is thus no longer part of the cs50 library.")
     else:
         response.append("Did you forget to `#include` the header file in which `{}` is declared atop " \
             "your file?".format(matches.group[0]))
@@ -1361,7 +1363,7 @@ def undefined_reference(lines):
                 "against the file that implements `{}`.".format(matches.group[0])
         ]
 
-        if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long",
+        if matches.group[0] in ["get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long",
                                 "get_string"]:
             response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, " \
                 "which implements `{}`?".format(matches.group[0]))
