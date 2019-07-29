@@ -1355,7 +1355,7 @@ def undefined_reference(lines):
 
         if len(lines) > 3 and "make: *** [helpers] Error" in lines[2]:
             response.append("Are you compiling a `helpers.c` file instead of the file containing the program itself?")
-    else:
+    else:        
         response = [
             "By \"undefined reference,\" `clang` means that you've called a function, `{}`, that doesn't seem to be " \
                 "implemented.".format(matches.group[0]),
@@ -1363,7 +1363,7 @@ def undefined_reference(lines):
                 "against the file that implements `{}`.".format(matches.group[0])
         ]
 
-        if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long",
+        if matches.group[0] in ["get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long",
                                 "get_string"]:
             response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, " \
                 "which implements `{}`?".format(matches.group[0]))
