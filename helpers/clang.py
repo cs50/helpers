@@ -863,7 +863,7 @@ def implicit_declaration_of_fun(lines):
             "your file?".format(matches.group[0]))
         response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group[0], matches.file))
 
-    if len(lines) >= 2 and re.search(matches.group[0], lines[1]):
+    if len(lines) >= 2 and matches.group[0] in lines[1]:
         return lines[0:2], response
 
     return lines[0:1], response
@@ -1355,7 +1355,7 @@ def undefined_reference(lines):
 
         if len(lines) > 3 and "make: *** [helpers] Error" in lines[2]:
             response.append("Are you compiling a `helpers.c` file instead of the file containing the program itself?")
-    else:        
+    else:
         response = [
             "By \"undefined reference,\" `clang` means that you've called a function, `{}`, that doesn't seem to be " \
                 "implemented.".format(matches.group[0]),
@@ -1518,7 +1518,7 @@ def use_of_undeclared_indentifier(lines):
         response.append("If you mean to use `{}` as a variable, make sure to declare it by specifying its type, and " \
             "check that the variable name is spelled correctly.".format(matches.group[0]))
 
-    if len(lines) >= 2 and re.search(matches.file, lines[1]):
+    if len(lines) >= 2 and matches.file in lines[1]:
         return lines[0:2], response
 
     return lines[0:1], response
@@ -1545,7 +1545,7 @@ def variable_uninitialized(lines):
         "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group[0])
     ]
 
-    if len(lines) >= 2 and re.search(matches.group[0], lines[1]):
+    if len(lines) >= 2 and matches.group[0] in lines[1]:
         return lines[0:2], response
 
     return lines[0:1], response
