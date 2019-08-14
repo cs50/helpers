@@ -1,3 +1,3 @@
 int main(void) {
-  int x = get_int();
+  int x = eprintf();
 }
