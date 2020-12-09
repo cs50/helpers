@@ -113,3 +113,23 @@ def up_to_date(lines):
     ]
 
     return lines[0:1], response
+
+@helper("make")
+def strcpy(lines):
+    """
+    cc     strcpy.c   -o strcpy
+    strcpy.c:6:11: error: array type 'char [50]' is not assignable
+        hello = "hello, world!"
+        ~~~~~ ^
+    1 error generated.
+    make: *** [strcpy] Error 1
+    """
+    matches = re.search(r"error: array type 'char [[0-9]+]' is not assignable$", lines[1])
+    if not matches:
+        return
+    
+    response = [
+        "You can't assign to an array, only copy to it. Use strcpy() instead."
+    ]
+
+    return lines[1:4], response
